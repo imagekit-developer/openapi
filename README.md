@@ -1,6 +1,6 @@
 # ImageKit's OpenAPI Specification
 
-This repository contains an [OpenAPI](https://spec.openapis.org/oas/v3.1.0.html) specification for the [Image Kit API](https://imagekit.io/docs/api-reference).
+This repository contains an [OpenAPI](https://spec.openapis.org/oas/v3.1.0.html) specification for the [ImageKit API](https://imagekit.io/docs/api-reference).
 
 ## Spec
 
