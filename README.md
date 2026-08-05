@@ -4,9 +4,6 @@ This repository contains an [OpenAPI](https://spec.openapis.org/oas/v3.1.0.html)
 
 ## Spec
 
-> [!CAUTION]
-> This spec is primarily intended for Image Kit's internal use. Stability of the spec is not guaranteed.
-
 [**View the spec**](openapi.yml)
 
 ## Clients
@@ -18,3 +15,4 @@ Our official clients are generated from this spec:
 - [imagekit-go](https://github.com/imagekit-developer/imagekit-go) (Go)
 - [imagekit-java](https://github.com/imagekit-developer/imagekit-java) (Java)
 - [imagekit-ruby](https://github.com/imagekit-developer/imagekit-ruby) (Ruby)
+- [imagekit-dotnet](https://github.com/imagekit-developer/imagekit-dotnet) (Dotnet)
