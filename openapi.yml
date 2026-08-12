@@ -4155,7 +4155,9 @@ paths:
                     examples:
                       - "`name` is required and may contain only alphanumeric characters or '_'."
                       - "`transformation` is required and cannot be empty."
-                      - "`transformation` contains an invalid transformation string."
+                      - "`transformation` is invalid. `transformation` contains an invalid or unsupported transformation string."
+                      - "`transformation` cannot include a named transformation reference."
+                      - "Your request must not contain any additional properties."
                       - "You have reached the maximum limit of 250 named transformations allowed per account."
                   help: &a10
                     type: string
@@ -4199,6 +4201,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/NamedTransformation"
               example: *a9
+        "400": &a11
+          description: Bad request. The `id` path parameter is malformed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid 'id' in path parameter
+                  help: *a10
         "401": *a1
         "403": *a2
         "404": &a8
@@ -4222,7 +4235,7 @@ paths:
       description: |
         Updates the named transformation identified by `id` and returns the updated object. Only the fields present in the request body are updated; other fields stay unchanged.
 
-        Renaming or disabling a named transformation fails with a `409` error if it is still referenced (via the `n-<name>` token) by another enabled named transformation, or by an upload pre-transformation/post-transformation setting. References from disabled named transformations don't count. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
+        Renaming or disabling a named transformation fails with a `409` error if it is still referenced (via the `n-<name>` token) by an upload pre-transformation or post-transformation setting. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
       parameters:
         - *a6
       requestBody:
@@ -4247,7 +4260,7 @@ paths:
                 enabled: true
                 createdAt: "2024-01-10T09:00:00.000Z"
         "400":
-          description: Bad request. The request body failed validation.
+          description: Bad request. The request body or `id` path parameter failed validation.
           content:
             application/json:
               schema:
@@ -4257,7 +4270,10 @@ paths:
                     type: string
                     examples:
                       - "`name` may contain only alphanumeric characters or '_'."
-                      - "`transformation` contains an invalid transformation string."
+                      - "`transformation` is invalid. `transformation` contains an invalid or unsupported transformation string."
+                      - "`transformation` cannot include a named transformation reference."
+                      - "Your request must not contain any additional properties."
+                      - "Invalid `id` in path parameter."
                   help: *a10
         "401": *a1
         "403": *a2
@@ -4273,8 +4289,8 @@ paths:
                     type: string
                     examples:
                       - "A named transformation with the name 'small_thumbnail' already exists."
-                      - 'Named transformation "small_thumbnail" cannot be renamed because it is referenced by named transformation "wrapper_transform".'
-                      - 'Named transformation "small_thumbnail" cannot be disabled because it is referenced by named transformation "wrapper_transform".'
+                      - 'Named transformation "small_thumbnail" cannot be renamed because it is referenced by an upload pre-transformation or post-transformation setting.'
+                      - 'Named transformation "small_thumbnail" cannot be disabled because it is referenced by an upload pre-transformation or post-transformation setting.'
                   help: *a10
         "429": *a3
     delete:
@@ -4286,7 +4302,7 @@ paths:
       description: |
         Permanently deletes the named transformation identified by `id` and returns the deleted object.
 
-        Deletion fails with a `409` error if the named transformation is still referenced (via the `n-<name>` token) by another enabled named transformation, or by an upload pre-transformation/post-transformation setting. References from disabled named transformations don't count. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
+        Deletion fails with a `409` error if the named transformation is still referenced (via the `n-<name>` token) by an upload pre-transformation or post-transformation setting. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
       parameters:
         - *a6
       responses:
@@ -4297,17 +4313,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/NamedTransformation"
               example: *a9
-        "400":
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bad request.
-                  help: *a10
+        "400": *a11
         "401": *a1
         "403": *a2
         "404": *a8
@@ -4320,7 +4326,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Named transformation "small_thumbnail" cannot be deleted because it is referenced by named transformation "wrapper_transform".'
+                    example: 'Named transformation "small_thumbnail" cannot be deleted because it is referenced by an upload pre-transformation or post-transformation setting.'
                   help: *a10
         "429": *a3
 components:
@@ -6177,7 +6183,6 @@ components:
     NamedTransformationNameField:
       type: string
       minLength: 1
-      maxLength: 255
       pattern: "^[0-9a-zA-Z_]+$"
       description: |
         Alias for the transformation string, used in URLs as `tr:n-<name>`. Must contain only alphanumeric characters or `_` (no hyphens), and be unique for your account. Name matching is case-sensitive.
@@ -6186,7 +6191,7 @@ components:
       type: string
       minLength: 1
       description: |
-        The transformation string this name refers to, for example `w-150,h-150,fo-center,cm-resize`. The `tr:` prefix is optional — it's added automatically if missing, and validated if present. Learn more about the [transformation syntax](https://imagekit.io/docs/transformations).
+        The transformation string this name refers to, for example `w-150,h-150,fo-center,cm-resize`. The `tr:` prefix is optional — it's added automatically if missing, and validated if present. The string must be a valid ImageKit transformation and cannot itself reference another named transformation (no nesting). Learn more about the [transformation syntax](https://imagekit.io/docs/transformations).
       example: "w-150,h-150,fo-center,cm-resize"
     CreateNamedTransformation:
       title: Create Named Transformation
@@ -6194,6 +6199,7 @@ components:
       required:
         - name
         - transformation
+      additionalProperties: false
       properties:
         name:
           $ref: "#/components/schemas/NamedTransformationNameField"
@@ -6207,6 +6213,7 @@ components:
     UpdateNamedTransformation:
       title: Update Named Transformation
       type: object
+      additionalProperties: false
       properties:
         name:
           $ref: "#/components/schemas/NamedTransformationNameField"
