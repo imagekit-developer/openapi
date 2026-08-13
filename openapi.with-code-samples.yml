@@ -102,8 +102,8 @@ paths:
           import (
           	"context"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -239,8 +239,8 @@ paths:
           	"fmt"
           	"io"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -413,8 +413,8 @@ paths:
           	"fmt"
           	"io"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -483,6 +483,11 @@ paths:
                 label:
                   type: string
                   description: Human readable name of the custom metadata field. This should be unique across all non deleted custom metadata fields. This name is displayed as form field label to the users while setting field value on an asset in the media library UI.
+                description:
+                  type: string
+                  maxLength: 500
+                  description: |
+                    Optional description for the custom metadata field. Can be up to 500 characters. This is shown as a hint to the users while setting the field's value on an asset in the media library UI.
                 schema:
                   type: object
                   required:
@@ -650,8 +655,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -793,8 +798,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -955,8 +960,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -1152,8 +1157,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -1213,7 +1218,7 @@ paths:
       operationId: update-existing-field
       summary: Update existing field
       description: |
-        This API updates the label or schema of an existing custom metadata field.
+        This API updates the label, description, or schema of an existing custom metadata field.
       parameters:
         - description: |
             Should be a valid custom metadata field id.
@@ -1231,6 +1236,11 @@ paths:
                 label:
                   type: string
                   description: Human readable name of the custom metadata field. This should be unique across all non deleted custom metadata fields. This name is displayed as form field label to the users while setting field value on an asset in the media library UI. This parameter is required if `schema` is not provided.
+                description:
+                  type: string
+                  maxLength: 500
+                  description: |
+                    Optional description for the custom metadata field. Can be up to 500 characters. Send an empty string to clear an existing description. This is shown as a hint to the users while setting the field's value on an asset in the media library UI.
                 schema:
                   type: object
                   description: |
@@ -1322,8 +1332,10 @@ paths:
                     type: string
                     examples:
                       - Cannot update a deleted custom metadata fields.
-                      - Either label or schema should be provided.
+                      - Either label, description or schema should be provided.
                       - A custom metadata field with this label already exists.
+                      - description must be a string
+                      - description must be at most 500 characters
                       - Invalid schema object.
                       - Name cannot be updated.
                       - Missing id parameter.
@@ -1397,8 +1409,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -1541,8 +1553,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -1834,8 +1846,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -1955,8 +1967,8 @@ paths:
           import (
           	"context"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -2140,8 +2152,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -2306,8 +2318,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -2468,8 +2480,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -2684,8 +2696,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -2886,8 +2898,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -3055,8 +3067,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -3205,8 +3217,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -3386,8 +3398,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -3595,8 +3607,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -3810,8 +3822,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -4019,8 +4031,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -4173,8 +4185,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -4319,8 +4331,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -4497,8 +4509,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -4676,8 +4688,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -4869,8 +4881,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -5051,8 +5063,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -5177,8 +5189,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -5305,8 +5317,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -5440,8 +5452,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -5574,8 +5586,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -5672,8 +5684,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -5794,9 +5806,9 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
-          	"github.com/imagekit-developer/imagekit-go/shared"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          	"github.com/imagekit-developer/imagekit-go/v2/shared"
           )
 
           func main() {
@@ -5938,8 +5950,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6070,8 +6082,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6192,8 +6204,8 @@ paths:
           import (
           	"context"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6345,8 +6357,8 @@ paths:
           	"fmt"
           	"time"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6448,8 +6460,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6571,8 +6583,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6703,8 +6715,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6844,8 +6856,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -6970,8 +6982,8 @@ paths:
           import (
           	"context"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -7075,8 +7087,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -7191,8 +7203,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -7313,8 +7325,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -7447,8 +7459,8 @@ paths:
           	"context"
           	"fmt"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -7576,8 +7588,8 @@ paths:
           import (
           	"context"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -7884,8 +7896,8 @@ paths:
           	"fmt"
           	"time"
 
-          	"github.com/imagekit-developer/imagekit-go"
-          	"github.com/imagekit-developer/imagekit-go/option"
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
           )
 
           func main() {
@@ -10458,6 +10470,11 @@ components:
           type: string
           description: |
             Human readable name of the custom metadata field. This name is displayed as form field label to the users while setting field value on the asset in the media library UI.
+        description:
+          type: string
+          maxLength: 500
+          description: |
+            Optional description of the custom metadata field. Only present when a description has been set. Shown as a hint to the users while setting the field's value on an asset in the media library UI.
         schema:
           type: object
           description: An object that describes the rules for the custom metadata field value.
