@@ -8476,11 +8476,6 @@ paths:
       responses:
         "204":
           description: Named transformation deleted successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                x-stainless-empty-object: true
         "400": *a11
         "401": *a1
         "403": *a2
@@ -8506,9 +8501,7 @@ paths:
             password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
           });
 
-          const namedTransformation = await client.namedTransformations.delete('6bZ9x2ZUx');
-
-          console.log(namedTransformation);
+          await client.namedTransformations.delete('6bZ9x2ZUx');
         python: |-
           import os
           from imagekitio import ImageKit
@@ -8517,16 +8510,14 @@ paths:
               private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
               password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
           )
-          named_transformation = client.named_transformations.delete(
+          client.named_transformations.delete(
               "6bZ9x2ZUx",
           )
-          print(named_transformation)
         go: |
           package main
 
           import (
           	"context"
-          	"fmt"
 
           	"github.com/imagekit-developer/imagekit-go/v2"
           	"github.com/imagekit-developer/imagekit-go/v2/option"
@@ -8537,11 +8528,10 @@ paths:
           		option.WithPrivateKey("My Private Key"),
           		option.WithPassword("My Password"),
           	)
-          	namedTransformation, err := client.NamedTransformations.Delete(context.TODO(), "6bZ9x2ZUx")
+          	err := client.NamedTransformations.Delete(context.TODO(), "6bZ9x2ZUx")
           	if err != nil {
           		panic(err.Error())
           	}
-          	fmt.Printf("%+v\n", namedTransformation)
           }
         java: |-
           package io.imagekit.example;
@@ -8549,7 +8539,6 @@ paths:
           import io.imagekit.client.ImageKitClient;
           import io.imagekit.client.okhttp.ImageKitOkHttpClient;
           import io.imagekit.models.namedtransformations.NamedTransformationDeleteParams;
-          import io.imagekit.models.namedtransformations.NamedTransformationDeleteResponse;
 
           public final class Main {
               private Main() {}
@@ -8557,7 +8546,7 @@ paths:
               public static void main(String[] args) {
                   ImageKitClient client = ImageKitOkHttpClient.fromEnv();
 
-                  NamedTransformationDeleteResponse namedTransformation = client.namedTransformations().delete("6bZ9x2ZUx");
+                  client.namedTransformations().delete("6bZ9x2ZUx");
               }
           }
         ruby: |-
@@ -8565,9 +8554,9 @@ paths:
 
           image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
 
-          named_transformation = image_kit.named_transformations.delete("6bZ9x2ZUx")
+          result = image_kit.named_transformations.delete("6bZ9x2ZUx")
 
-          puts(named_transformation)
+          puts(result)
 components:
   schemas:
     BaseWebhookEvent:

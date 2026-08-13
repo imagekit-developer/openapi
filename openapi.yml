@@ -4319,11 +4319,6 @@ paths:
       responses:
         "204":
           description: Named transformation deleted successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                x-stainless-empty-object: true
         "400": *a11
         "401": *a1
         "403": *a2
