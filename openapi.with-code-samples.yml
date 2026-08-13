@@ -483,6 +483,11 @@ paths:
                 label:
                   type: string
                   description: Human readable name of the custom metadata field. This should be unique across all non deleted custom metadata fields. This name is displayed as form field label to the users while setting field value on an asset in the media library UI.
+                description:
+                  type: string
+                  maxLength: 500
+                  description: |
+                    Optional description for the custom metadata field. Can be up to 500 characters. This is shown as a hint to the users while setting the field's value on an asset in the media library UI.
                 schema:
                   type: object
                   required:
@@ -1213,7 +1218,7 @@ paths:
       operationId: update-existing-field
       summary: Update existing field
       description: |
-        This API updates the label or schema of an existing custom metadata field.
+        This API updates the label, description, or schema of an existing custom metadata field.
       parameters:
         - description: |
             Should be a valid custom metadata field id.
@@ -1231,6 +1236,11 @@ paths:
                 label:
                   type: string
                   description: Human readable name of the custom metadata field. This should be unique across all non deleted custom metadata fields. This name is displayed as form field label to the users while setting field value on an asset in the media library UI. This parameter is required if `schema` is not provided.
+                description:
+                  type: string
+                  maxLength: 500
+                  description: |
+                    Optional description for the custom metadata field. Can be up to 500 characters. Send an empty string to clear an existing description. This is shown as a hint to the users while setting the field's value on an asset in the media library UI.
                 schema:
                   type: object
                   description: |
@@ -1322,8 +1332,10 @@ paths:
                     type: string
                     examples:
                       - Cannot update a deleted custom metadata fields.
-                      - Either label or schema should be provided.
+                      - Either label, description or schema should be provided.
                       - A custom metadata field with this label already exists.
+                      - description must be a string
+                      - description must be at most 500 characters
                       - Invalid schema object.
                       - Name cannot be updated.
                       - Missing id parameter.
@@ -7955,7 +7967,7 @@ paths:
                 - &a9
                   id: "6bZ9x2ZUx"
                   name: "small_thumbnail"
-                  transformation: "tr:w-150,h-150,fo-center,cm-resize"
+                  transformation: "w-150,h-150,fo-center,cm-resize"
                   enabled: true
                   createdAt: "2024-01-10T09:00:00.000Z"
         "401": *a1
@@ -8195,9 +8207,7 @@ paths:
           name: id
           required: true
           schema:
-            type: string
-          description: >
-            Unique identifier of the named transformation. This is the `id` returned when the named transformation was created.
+            $ref: "#/components/schemas/NamedTransformationIdField"
       responses:
         "200":
           description: Successful response.
@@ -8240,7 +8250,7 @@ paths:
             password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
           });
 
-          const namedTransformation = await client.namedTransformations.get('id');
+          const namedTransformation = await client.namedTransformations.get('6bZ9x2ZUx');
 
           console.log(namedTransformation.id);
         python: |-
@@ -8252,7 +8262,7 @@ paths:
               password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
           )
           named_transformation = client.named_transformations.get(
-              "id",
+              "6bZ9x2ZUx",
           )
           print(named_transformation.id)
         go: |
@@ -8271,7 +8281,7 @@ paths:
           		option.WithPrivateKey("My Private Key"),
           		option.WithPassword("My Password"),
           	)
-          	namedTransformation, err := client.NamedTransformations.Get(context.TODO(), "id")
+          	namedTransformation, err := client.NamedTransformations.Get(context.TODO(), "6bZ9x2ZUx")
           	if err != nil {
           		panic(err.Error())
           	}
@@ -8291,7 +8301,7 @@ paths:
               public static void main(String[] args) {
                   ImageKitClient client = ImageKitOkHttpClient.fromEnv();
 
-                  NamedTransformation namedTransformation = client.namedTransformations().get("id");
+                  NamedTransformation namedTransformation = client.namedTransformations().get("6bZ9x2ZUx");
               }
           }
         ruby: |-
@@ -8299,7 +8309,7 @@ paths:
 
           image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
 
-          named_transformation = image_kit.named_transformations.get("id")
+          named_transformation = image_kit.named_transformations.get("6bZ9x2ZUx")
 
           puts(named_transformation)
     patch:
@@ -8322,6 +8332,7 @@ paths:
               $ref: "#/components/schemas/UpdateNamedTransformation"
             example:
               transformation: "w-200,h-200,fo-center,cm-resize"
+              enabled: false
       responses:
         "200":
           description: Named transformation updated successfully.
@@ -8332,8 +8343,8 @@ paths:
               example:
                 id: "6bZ9x2ZUx"
                 name: "small_thumbnail"
-                transformation: "tr:w-200,h-200,fo-center,cm-resize"
-                enabled: true
+                transformation: "w-200,h-200,fo-center,cm-resize"
+                enabled: false
                 createdAt: "2024-01-10T09:00:00.000Z"
         "400":
           description: Bad request. The request body or `id` path parameter failed validation.
@@ -8378,7 +8389,7 @@ paths:
             password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
           });
 
-          const namedTransformation = await client.namedTransformations.update('id', {
+          const namedTransformation = await client.namedTransformations.update('6bZ9x2ZUx', {
             transformation: 'w-200,h-200,fo-center,cm-resize',
           });
 
@@ -8392,7 +8403,8 @@ paths:
               password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
           )
           named_transformation = client.named_transformations.update(
-              id="id",
+              id="6bZ9x2ZUx",
+              enabled=False,
               transformation="w-200,h-200,fo-center,cm-resize",
           )
           print(named_transformation.id)
@@ -8414,7 +8426,7 @@ paths:
           	)
           	namedTransformation, err := client.NamedTransformations.Update(
           		context.TODO(),
-          		"id",
+          		"6bZ9x2ZUx",
           		imagekit.NamedTransformationUpdateParams{
           			Transformation: imagekit.String("w-200,h-200,fo-center,cm-resize"),
           		},
@@ -8438,7 +8450,7 @@ paths:
               public static void main(String[] args) {
                   ImageKitClient client = ImageKitOkHttpClient.fromEnv();
 
-                  NamedTransformation namedTransformation = client.namedTransformations().update("id");
+                  NamedTransformation namedTransformation = client.namedTransformations().update("6bZ9x2ZUx");
               }
           }
         ruby: |-
@@ -8446,7 +8458,7 @@ paths:
 
           image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
 
-          named_transformation = image_kit.named_transformations.update("id")
+          named_transformation = image_kit.named_transformations.update("6bZ9x2ZUx")
 
           puts(named_transformation)
     delete:
@@ -8456,19 +8468,19 @@ paths:
         - Named Transformations
       operationId: delete-named-transformation
       description: |
-        Permanently deletes the named transformation identified by `id` and returns the deleted object.
+        Permanently deletes the named transformation identified by `id`.
 
         Deletion fails with a `409` error if the named transformation is still referenced (via the `n-<name>` token) by an upload pre-transformation or post-transformation setting. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
       parameters:
         - *a6
       responses:
-        "200":
-          description: Named transformation deleted successfully. Returns the deleted object.
+        "204":
+          description: Named transformation deleted successfully.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NamedTransformation"
-              example: *a9
+                type: object
+                x-stainless-empty-object: true
         "400": *a11
         "401": *a1
         "403": *a2
@@ -8494,9 +8506,9 @@ paths:
             password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
           });
 
-          const namedTransformation = await client.namedTransformations.delete('id');
+          const namedTransformation = await client.namedTransformations.delete('6bZ9x2ZUx');
 
-          console.log(namedTransformation.id);
+          console.log(namedTransformation);
         python: |-
           import os
           from imagekitio import ImageKit
@@ -8506,9 +8518,9 @@ paths:
               password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
           )
           named_transformation = client.named_transformations.delete(
-              "id",
+              "6bZ9x2ZUx",
           )
-          print(named_transformation.id)
+          print(named_transformation)
         go: |
           package main
 
@@ -8525,19 +8537,19 @@ paths:
           		option.WithPrivateKey("My Private Key"),
           		option.WithPassword("My Password"),
           	)
-          	namedTransformation, err := client.NamedTransformations.Delete(context.TODO(), "id")
+          	namedTransformation, err := client.NamedTransformations.Delete(context.TODO(), "6bZ9x2ZUx")
           	if err != nil {
           		panic(err.Error())
           	}
-          	fmt.Printf("%+v\n", namedTransformation.ID)
+          	fmt.Printf("%+v\n", namedTransformation)
           }
         java: |-
           package io.imagekit.example;
 
           import io.imagekit.client.ImageKitClient;
           import io.imagekit.client.okhttp.ImageKitOkHttpClient;
-          import io.imagekit.models.NamedTransformation;
           import io.imagekit.models.namedtransformations.NamedTransformationDeleteParams;
+          import io.imagekit.models.namedtransformations.NamedTransformationDeleteResponse;
 
           public final class Main {
               private Main() {}
@@ -8545,7 +8557,7 @@ paths:
               public static void main(String[] args) {
                   ImageKitClient client = ImageKitOkHttpClient.fromEnv();
 
-                  NamedTransformation namedTransformation = client.namedTransformations().delete("id");
+                  NamedTransformationDeleteResponse namedTransformation = client.namedTransformations().delete("6bZ9x2ZUx");
               }
           }
         ruby: |-
@@ -8553,7 +8565,7 @@ paths:
 
           image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
 
-          named_transformation = image_kit.named_transformations.delete("id")
+          named_transformation = image_kit.named_transformations.delete("6bZ9x2ZUx")
 
           puts(named_transformation)
 components:
@@ -10407,6 +10419,10 @@ components:
           type: string
           format: date-time
           description: Timestamp when the saved extension was last updated.
+    NamedTransformationIdField:
+      type: string
+      description: Unique identifier for a named transformation.
+      example: "6bZ9x2ZUx"
     NamedTransformationNameField:
       type: string
       minLength: 1
@@ -10418,8 +10434,12 @@ components:
       type: string
       minLength: 1
       description: |
-        The transformation string this name refers to, for example `w-150,h-150,fo-center,cm-resize`. The `tr:` prefix is optional — it's added automatically if missing, and validated if present. The string must be a valid ImageKit transformation and cannot itself reference another named transformation (no nesting). Learn more about the [transformation syntax](https://imagekit.io/docs/transformations).
+        The transformation string this name refers to, for example `w-150,h-150,fo-center,cm-resize`. The `tr:` prefix is optional; if present, it is validated. The string must be a valid ImageKit transformation and cannot itself reference another named transformation (no nesting). Learn more about the [transformation syntax](https://imagekit.io/docs/transformations).
       example: "w-150,h-150,fo-center,cm-resize"
+    NamedTransformationEnabledField:
+      type: boolean
+      description: Whether the named transformation is currently enabled. When this is set to `false`, requests using such disabled named transformations fail at delivery time.
+      example: true
     CreateNamedTransformation:
       title: Create Named Transformation
       type: object
@@ -10433,10 +10453,8 @@ components:
         transformation:
           $ref: "#/components/schemas/NamedTransformationValueField"
         enabled:
-          type: boolean
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
           default: true
-          description: |
-            Whether the named transformation is enabled. Set to `false` to disable it without deleting it; requests using a disabled named transformation fail at delivery time.
     UpdateNamedTransformation:
       title: Update Named Transformation
       type: object
@@ -10447,7 +10465,7 @@ components:
         transformation:
           $ref: "#/components/schemas/NamedTransformationValueField"
         enabled:
-          type: boolean
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
           description: |
             Whether the named transformation is enabled. Omit to leave the current value unchanged.
     NamedTransformation:
@@ -10457,22 +10475,13 @@ components:
       type: object
       properties:
         id:
-          type: string
-          description: Unique identifier generated by ImageKit when the named transformation was created.
-          example: "6bZ9x2ZUx"
+          $ref: "#/components/schemas/NamedTransformationIdField"
         name:
-          type: string
-          description: Name of the named transformation, used as `tr:n-<name>` in image and video URLs.
-          example: "small_thumbnail"
+          $ref: "#/components/schemas/NamedTransformationNameField"
         transformation:
-          type: string
-          description: |
-            Transformation string this name refers to. Always includes the `tr:` prefix, even if you omitted it in the request.
-          example: "tr:w-150,h-150,fo-center,cm-resize"
+          $ref: "#/components/schemas/NamedTransformationValueField"
         enabled:
-          type: boolean
-          description: Whether the named transformation is currently enabled.
-          example: true
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
         createdAt:
           type: string
           format: date-time
@@ -11154,6 +11163,11 @@ components:
           type: string
           description: |
             Human readable name of the custom metadata field. This name is displayed as form field label to the users while setting field value on the asset in the media library UI.
+        description:
+          type: string
+          maxLength: 500
+          description: |
+            Optional description of the custom metadata field. Only present when a description has been set. Shown as a hint to the users while setting the field's value on an asset in the media library UI.
         schema:
           type: object
           description: An object that describes the rules for the custom metadata field value.
