@@ -7944,6 +7944,630 @@ paths:
           usage_analytics_response = image_kit.accounts.usage_analytics.get(end_date: "2019-12-27", start_date: "2019-12-27")
 
           puts(usage_analytics_response)
+
+  /v1/named-transformations:
+    get:
+      summary: List named transformations
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: list-named-transformations
+      description: |
+        Returns an array of all named transformations configured for your account.
+      responses:
+        "200":
+          description: Array of named transformation objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NamedTransformation"
+              example:
+                - &a9
+                  id: "6bZ9x2ZUx"
+                  name: "small_thumbnail"
+                  transformation: "w-150,h-150,fo-center,cm-resize"
+                  enabled: true
+                  createdAt: "2024-01-10T09:00:00.000Z"
+        "401": *a1
+        "403": *a2
+        "429": *a3
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const namedTransformations = await client.namedTransformations.list();
+
+          console.log(namedTransformations);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          named_transformations = client.named_transformations.list()
+          print(named_transformations)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	namedTransformations, err := client.NamedTransformations.List(context.TODO())
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", namedTransformations)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.NamedTransformation;
+          import io.imagekit.models.namedtransformations.NamedTransformationListParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  List<NamedTransformation> namedTransformations = client.namedTransformations().list();
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          named_transformations = image_kit.named_transformations.list
+
+          puts(named_transformations)
+    post:
+      summary: Create named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: create-named-transformation
+      description: |
+        Creates a new named transformation and returns the created object.
+
+        A named transformation is a short, reusable name for a transformation string. Use it in image and video URLs as `tr:n-<name>`, and update the underlying transformation later without changing existing URLs. Learn more about [named transformations](https://imagekit.io/docs/transformations#named-transformations).
+
+        You can create up to 250 named transformations per account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNamedTransformation"
+            example:
+              name: "small_thumbnail"
+              transformation: "w-150,h-150,fo-center,cm-resize"
+              enabled: true
+      responses:
+        "201":
+          description: Named transformation created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NamedTransformation"
+              example: *a9
+        "400":
+          description: Bad request. The request body failed validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "`name` is required and may contain only alphanumeric characters or '_'."
+                      - "`transformation` is required and cannot be empty."
+                      - "`transformation` is invalid. `transformation` contains an invalid or unsupported transformation string."
+                      - "`transformation` cannot include a named transformation reference."
+                      - "Your request must not contain any additional properties."
+                      - "You have reached the maximum limit of 250 named transformations allowed per account."
+                  help: &a10
+                    type: string
+                    example: For support kindly contact us at support@imagekit.io.
+        "409":
+          description: A named transformation with this name already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "A named transformation with the name 'small_thumbnail' already exists."
+                  help: *a10
+        "401": *a1
+        "403": *a2
+        "429": *a3
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const namedTransformation = await client.namedTransformations.create({
+            name: 'small_thumbnail',
+            transformation: 'w-150,h-150,fo-center,cm-resize',
+            enabled: true,
+          });
+
+          console.log(namedTransformation.id);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          named_transformation = client.named_transformations.create(
+              name="small_thumbnail",
+              transformation="w-150,h-150,fo-center,cm-resize",
+              enabled=True,
+          )
+          print(named_transformation.id)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	namedTransformation, err := client.NamedTransformations.New(context.TODO(), imagekit.NamedTransformationNewParams{
+          		Name:           "small_thumbnail",
+          		Transformation: "w-150,h-150,fo-center,cm-resize",
+          		Enabled:        imagekit.Bool(true),
+          	})
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", namedTransformation.ID)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.NamedTransformation;
+          import io.imagekit.models.namedtransformations.NamedTransformationCreateParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  NamedTransformationCreateParams params = NamedTransformationCreateParams.builder()
+                      .name("small_thumbnail")
+                      .transformation("w-150,h-150,fo-center,cm-resize")
+                      .build();
+                  NamedTransformation namedTransformation = client.namedTransformations().create(params);
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          named_transformation = image_kit.named_transformations.create(
+            name: "small_thumbnail",
+            transformation: "w-150,h-150,fo-center,cm-resize"
+          )
+
+          puts(named_transformation)
+  "/v1/named-transformations/{id}":
+    get:
+      summary: Get named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: get-named-transformation
+      description: Retrieves the named transformation identified by `id`.
+      parameters:
+        - &a6
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: "#/components/schemas/NamedTransformationIdField"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NamedTransformation"
+              example: *a9
+        "400": &a11
+          description: Bad request. The `id` path parameter is malformed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid 'id' in path parameter
+                  help: *a10
+        "401": *a1
+        "403": *a2
+        "404": &a8
+          description: Named transformation not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Named transformation with id "6bZ9x2ZUx" not found.'
+                  help: *a10
+        "429": *a3
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const namedTransformation = await client.namedTransformations.get('6bZ9x2ZUx');
+
+          console.log(namedTransformation.id);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          named_transformation = client.named_transformations.get(
+              "6bZ9x2ZUx",
+          )
+          print(named_transformation.id)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	namedTransformation, err := client.NamedTransformations.Get(context.TODO(), "6bZ9x2ZUx")
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", namedTransformation.ID)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.NamedTransformation;
+          import io.imagekit.models.namedtransformations.NamedTransformationGetParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  NamedTransformation namedTransformation = client.namedTransformations().get("6bZ9x2ZUx");
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          named_transformation = image_kit.named_transformations.get("6bZ9x2ZUx")
+
+          puts(named_transformation)
+    patch:
+      summary: Update named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: update-named-transformation
+      description: |
+        Updates the named transformation identified by `id` and returns the updated object. Only the fields present in the request body are updated; other fields stay unchanged.
+
+        Renaming or disabling a named transformation fails with a `409` error if it is still referenced (via the `n-<name>` token) by an upload pre-transformation or post-transformation setting. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
+      parameters:
+        - *a6
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNamedTransformation"
+            example:
+              transformation: "w-200,h-200,fo-center,cm-resize"
+              enabled: false
+      responses:
+        "200":
+          description: Named transformation updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NamedTransformation"
+              example:
+                id: "6bZ9x2ZUx"
+                name: "small_thumbnail"
+                transformation: "w-200,h-200,fo-center,cm-resize"
+                enabled: false
+                createdAt: "2024-01-10T09:00:00.000Z"
+        "400":
+          description: Bad request. The request body or `id` path parameter failed validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "`name` may contain only alphanumeric characters or '_'."
+                      - "`transformation` is invalid. `transformation` contains an invalid or unsupported transformation string."
+                      - "`transformation` cannot include a named transformation reference."
+                      - "Your request must not contain any additional properties."
+                      - "Invalid `id` in path parameter."
+                  help: *a10
+        "401": *a1
+        "403": *a2
+        "404": *a8
+        "409":
+          description: The new name is already taken, or this named transformation is still referenced elsewhere (see the description above).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "A named transformation with the name 'small_thumbnail' already exists."
+                      - 'Named transformation "small_thumbnail" cannot be renamed because it is referenced by an upload pre-transformation or post-transformation setting.'
+                      - 'Named transformation "small_thumbnail" cannot be disabled because it is referenced by an upload pre-transformation or post-transformation setting.'
+                  help: *a10
+        "429": *a3
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const namedTransformation = await client.namedTransformations.update('6bZ9x2ZUx', {
+            transformation: 'w-200,h-200,fo-center,cm-resize',
+          });
+
+          console.log(namedTransformation.id);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          named_transformation = client.named_transformations.update(
+              id="6bZ9x2ZUx",
+              enabled=False,
+              transformation="w-200,h-200,fo-center,cm-resize",
+          )
+          print(named_transformation.id)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	namedTransformation, err := client.NamedTransformations.Update(
+          		context.TODO(),
+          		"6bZ9x2ZUx",
+          		imagekit.NamedTransformationUpdateParams{
+          			Transformation: imagekit.String("w-200,h-200,fo-center,cm-resize"),
+          		},
+          	)
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", namedTransformation.ID)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.NamedTransformation;
+          import io.imagekit.models.namedtransformations.NamedTransformationUpdateParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  NamedTransformation namedTransformation = client.namedTransformations().update("6bZ9x2ZUx");
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          named_transformation = image_kit.named_transformations.update("6bZ9x2ZUx")
+
+          puts(named_transformation)
+    delete:
+      summary: Delete named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: delete-named-transformation
+      description: |
+        Permanently deletes the named transformation identified by `id`.
+
+        Deletion fails with a `409` error if the named transformation is still referenced (via the `n-<name>` token) by an upload pre-transformation or post-transformation setting. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
+      parameters:
+        - *a6
+      responses:
+        "204":
+          description: Named transformation deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                x-stainless-empty-object: true
+        "400": *a11
+        "401": *a1
+        "403": *a2
+        "404": *a8
+        "409":
+          description: The named transformation is still referenced elsewhere and cannot be deleted (see the description above).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Named transformation "small_thumbnail" cannot be deleted because it is referenced by an upload pre-transformation or post-transformation setting.'
+                  help: *a10
+        "429": *a3
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const namedTransformation = await client.namedTransformations.delete('6bZ9x2ZUx');
+
+          console.log(namedTransformation);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          named_transformation = client.named_transformations.delete(
+              "6bZ9x2ZUx",
+          )
+          print(named_transformation)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	namedTransformation, err := client.NamedTransformations.Delete(context.TODO(), "6bZ9x2ZUx")
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", namedTransformation)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.namedtransformations.NamedTransformationDeleteParams;
+          import io.imagekit.models.namedtransformations.NamedTransformationDeleteResponse;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  NamedTransformationDeleteResponse namedTransformation = client.namedTransformations().delete("6bZ9x2ZUx");
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          named_transformation = image_kit.named_transformations.delete("6bZ9x2ZUx")
+
+          puts(named_transformation)
 components:
   schemas:
     BaseWebhookEvent:
@@ -9795,6 +10419,75 @@ components:
           type: string
           format: date-time
           description: Timestamp when the saved extension was last updated.
+    NamedTransformationIdField:
+      type: string
+      description: Unique identifier for a named transformation.
+      example: "6bZ9x2ZUx"
+    NamedTransformationNameField:
+      type: string
+      minLength: 1
+      pattern: "^[0-9a-zA-Z_]+$"
+      description: |
+        Alias for the transformation string, used in URLs as `tr:n-<name>`. This is case-sensitive, contains only alphanumeric characters or `_` (underscore), and is unique across all named transformations for your account.
+      example: "small_thumbnail"
+    NamedTransformationValueField:
+      type: string
+      minLength: 1
+      description: |
+        The transformation string this named transformation refers to. Learn more about the [transformation string syntax](https://imagekit.io/docs/transformations).
+      example: "w-150,h-150,fo-center,cm-resize"
+    NamedTransformationEnabledField:
+      type: boolean
+      description: Whether the named transformation is currently enabled. When set to `false`, requests using this named transformation fail at delivery time.
+      example: true
+    CreateNamedTransformation:
+      title: Create Named Transformation
+      type: object
+      required:
+        - name
+        - transformation
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/NamedTransformationNameField"
+        transformation:
+          $ref: "#/components/schemas/NamedTransformationValueField"
+        enabled:
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
+          default: true
+    UpdateNamedTransformation:
+      title: Update Named Transformation
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/NamedTransformationNameField"
+        transformation:
+          $ref: "#/components/schemas/NamedTransformationValueField"
+        enabled:
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
+          description: |
+            Whether the named transformation is enabled. Omit to leave the current value unchanged.
+    NamedTransformation:
+      title: Named Transformation
+      description: |
+        A named transformation is an alias for a transformation string, letting you apply and later update complex transformations without changing your image or video URLs. Learn more about [named transformations](https://imagekit.io/docs/transformations#named-transformations).
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/NamedTransformationIdField"
+        name:
+          $ref: "#/components/schemas/NamedTransformationNameField"
+        transformation:
+          $ref: "#/components/schemas/NamedTransformationValueField"
+        enabled:
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
+        createdAt:
+          type: string
+          format: date-time
+          description: |
+            ISO 8601 timestamp of when the named transformation was created.
+          example: "2024-01-10T09:00:00.000Z"
     Extensions:
       title: Extensions Array
       type: array
