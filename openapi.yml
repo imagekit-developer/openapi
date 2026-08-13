@@ -4096,6 +4096,245 @@ paths:
         "401": *a1
         "403": *a2
         "429": *a3
+
+  /v1/named-transformations:
+    get:
+      summary: List named transformations
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: list-named-transformations
+      description: |
+        Returns an array of all named transformations configured for your account.
+      responses:
+        "200":
+          description: Array of named transformation objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NamedTransformation"
+              example:
+                - &a9
+                  id: "6bZ9x2ZUx"
+                  name: "small_thumbnail"
+                  transformation: "w-150,h-150,fo-center,cm-resize"
+                  enabled: true
+                  createdAt: "2024-01-10T09:00:00.000Z"
+        "401": *a1
+        "403": *a2
+        "429": *a3
+    post:
+      summary: Create named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: create-named-transformation
+      description: |
+        Creates a new named transformation and returns the created object.
+
+        A named transformation is a short, reusable name for a transformation string. Use it in image and video URLs as `tr:n-<name>`, and update the underlying transformation later without changing existing URLs. Learn more about [named transformations](https://imagekit.io/docs/transformations#named-transformations).
+
+        You can create up to 250 named transformations per account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNamedTransformation"
+            example:
+              name: "small_thumbnail"
+              transformation: "w-150,h-150,fo-center,cm-resize"
+              enabled: true
+      responses:
+        "201":
+          description: Named transformation created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NamedTransformation"
+              example: *a9
+        "400":
+          description: Bad request. The request body failed validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "`name` is required and may contain only alphanumeric characters or '_'."
+                      - "`transformation` is required and cannot be empty."
+                      - "`transformation` is invalid. `transformation` contains an invalid or unsupported transformation string."
+                      - "`transformation` cannot include a named transformation reference."
+                      - "Your request must not contain any additional properties."
+                      - "You have reached the maximum limit of 250 named transformations allowed per account."
+                  help: &a10
+                    type: string
+                    example: For support kindly contact us at support@imagekit.io.
+        "409":
+          description: A named transformation with this name already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "A named transformation with the name 'small_thumbnail' already exists."
+                  help: *a10
+        "401": *a1
+        "403": *a2
+        "429": *a3
+  "/v1/named-transformations/{id}":
+    get:
+      summary: Get named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: get-named-transformation
+      description: Retrieves the named transformation identified by `id`.
+      parameters:
+        - &a6
+          in: path
+          name: id
+          required: true
+          schema:
+            $ref: "#/components/schemas/NamedTransformationIdField"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NamedTransformation"
+              example: *a9
+        "400": &a11
+          description: Bad request. The `id` path parameter is malformed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid 'id' in path parameter
+                  help: *a10
+        "401": *a1
+        "403": *a2
+        "404": &a8
+          description: Named transformation not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Named transformation with id "6bZ9x2ZUx" not found.'
+                  help: *a10
+        "429": *a3
+    patch:
+      summary: Update named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: update-named-transformation
+      description: |
+        Updates the named transformation identified by `id` and returns the updated object. Only the fields present in the request body are updated; other fields stay unchanged.
+
+        Renaming or disabling a named transformation fails with a `409` error if it is still referenced (via the `n-<name>` token) by an upload pre-transformation or post-transformation setting. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
+      parameters:
+        - *a6
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNamedTransformation"
+            example:
+              transformation: "w-200,h-200,fo-center,cm-resize"
+              enabled: false
+      responses:
+        "200":
+          description: Named transformation updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NamedTransformation"
+              example:
+                id: "6bZ9x2ZUx"
+                name: "small_thumbnail"
+                transformation: "w-200,h-200,fo-center,cm-resize"
+                enabled: false
+                createdAt: "2024-01-10T09:00:00.000Z"
+        "400":
+          description: Bad request. The request body or `id` path parameter failed validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "`name` may contain only alphanumeric characters or '_'."
+                      - "`transformation` is invalid. `transformation` contains an invalid or unsupported transformation string."
+                      - "`transformation` cannot include a named transformation reference."
+                      - "Your request must not contain any additional properties."
+                      - "Invalid `id` in path parameter."
+                  help: *a10
+        "401": *a1
+        "403": *a2
+        "404": *a8
+        "409":
+          description: The new name is already taken, or this named transformation is still referenced elsewhere (see the description above).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "A named transformation with the name 'small_thumbnail' already exists."
+                      - 'Named transformation "small_thumbnail" cannot be renamed because it is referenced by an upload pre-transformation or post-transformation setting.'
+                      - 'Named transformation "small_thumbnail" cannot be disabled because it is referenced by an upload pre-transformation or post-transformation setting.'
+                  help: *a10
+        "429": *a3
+    delete:
+      summary: Delete named transformation
+      tags:
+        - Account Management API
+        - Named Transformations
+      operationId: delete-named-transformation
+      description: |
+        Permanently deletes the named transformation identified by `id`.
+
+        Deletion fails with a `409` error if the named transformation is still referenced (via the `n-<name>` token) by an upload pre-transformation or post-transformation setting. This check is best-effort and can't detect references in your own application code or in previously generated URLs.
+      parameters:
+        - *a6
+      responses:
+        "204":
+          description: Named transformation deleted successfully.
+        "400": *a11
+        "401": *a1
+        "403": *a2
+        "404": *a8
+        "409":
+          description: The named transformation is still referenced elsewhere and cannot be deleted (see the description above).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Named transformation "small_thumbnail" cannot be deleted because it is referenced by an upload pre-transformation or post-transformation setting.'
+                  help: *a10
+        "429": *a3
 components:
   schemas:
     BaseWebhookEvent:
@@ -5947,6 +6186,75 @@ components:
           type: string
           format: date-time
           description: Timestamp when the saved extension was last updated.
+    NamedTransformationIdField:
+      type: string
+      description: Unique identifier for a named transformation.
+      example: "6bZ9x2ZUx"
+    NamedTransformationNameField:
+      type: string
+      minLength: 1
+      pattern: "^[0-9a-zA-Z_]+$"
+      description: |
+        Alias for the transformation string, used in URLs as `tr:n-<name>`. This is case-sensitive, contains only alphanumeric characters or `_` (underscore), and is unique across all named transformations for your account.
+      example: "small_thumbnail"
+    NamedTransformationValueField:
+      type: string
+      minLength: 1
+      description: |
+        The transformation string this named transformation refers to. Learn more about the [transformation string syntax](https://imagekit.io/docs/transformations).
+      example: "w-150,h-150,fo-center,cm-resize"
+    NamedTransformationEnabledField:
+      type: boolean
+      description: Whether the named transformation is currently enabled. When set to `false`, requests using this named transformation fail at delivery time.
+      example: true
+    CreateNamedTransformation:
+      title: Create Named Transformation
+      type: object
+      required:
+        - name
+        - transformation
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/NamedTransformationNameField"
+        transformation:
+          $ref: "#/components/schemas/NamedTransformationValueField"
+        enabled:
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
+          default: true
+    UpdateNamedTransformation:
+      title: Update Named Transformation
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/NamedTransformationNameField"
+        transformation:
+          $ref: "#/components/schemas/NamedTransformationValueField"
+        enabled:
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
+          description: |
+            Whether the named transformation is enabled. Omit to leave the current value unchanged.
+    NamedTransformation:
+      title: Named Transformation
+      description: |
+        A named transformation is an alias for a transformation string, letting you apply and later update complex transformations without changing your image or video URLs. Learn more about [named transformations](https://imagekit.io/docs/transformations#named-transformations).
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/NamedTransformationIdField"
+        name:
+          $ref: "#/components/schemas/NamedTransformationNameField"
+        transformation:
+          $ref: "#/components/schemas/NamedTransformationValueField"
+        enabled:
+          $ref: "#/components/schemas/NamedTransformationEnabledField"
+        createdAt:
+          type: string
+          format: date-time
+          description: |
+            ISO 8601 timestamp of when the named transformation was created.
+          example: "2024-01-10T09:00:00.000Z"
     Extensions:
       title: Extensions Array
       type: array
