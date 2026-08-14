@@ -7967,7 +7967,7 @@ paths:
                 - &a9
                   id: "6bZ9x2ZUx"
                   name: "small_thumbnail"
-                  transformation: "w-150,h-150,fo-center,cm-resize"
+                  transformation: "w-150,h-150,fo-center,cm-pad_resize"
                   enabled: true
                   createdAt: "2024-01-10T09:00:00.000Z"
         "401": *a1
@@ -8062,7 +8062,7 @@ paths:
               $ref: "#/components/schemas/CreateNamedTransformation"
             example:
               name: "small_thumbnail"
-              transformation: "w-150,h-150,fo-center,cm-resize"
+              transformation: "w-150,h-150,fo-center,cm-pad_resize"
               enabled: true
       responses:
         "201":
@@ -8116,7 +8116,7 @@ paths:
 
           const namedTransformation = await client.namedTransformations.create({
             name: 'small_thumbnail',
-            transformation: 'w-150,h-150,fo-center,cm-resize',
+            transformation: 'w-150,h-150,fo-center,cm-pad_resize',
             enabled: true,
           });
 
@@ -8131,7 +8131,7 @@ paths:
           )
           named_transformation = client.named_transformations.create(
               name="small_thumbnail",
-              transformation="w-150,h-150,fo-center,cm-resize",
+              transformation="w-150,h-150,fo-center,cm-pad_resize",
               enabled=True,
           )
           print(named_transformation.id)
@@ -8153,7 +8153,7 @@ paths:
           	)
           	namedTransformation, err := client.NamedTransformations.New(context.TODO(), imagekit.NamedTransformationNewParams{
           		Name:           "small_thumbnail",
-          		Transformation: "w-150,h-150,fo-center,cm-resize",
+          		Transformation: "w-150,h-150,fo-center,cm-pad_resize",
           		Enabled:        imagekit.Bool(true),
           	})
           	if err != nil {
@@ -8177,7 +8177,7 @@ paths:
 
                   NamedTransformationCreateParams params = NamedTransformationCreateParams.builder()
                       .name("small_thumbnail")
-                      .transformation("w-150,h-150,fo-center,cm-resize")
+                      .transformation("w-150,h-150,fo-center,cm-pad_resize")
                       .build();
                   NamedTransformation namedTransformation = client.namedTransformations().create(params);
               }
@@ -8189,7 +8189,7 @@ paths:
 
           named_transformation = image_kit.named_transformations.create(
             name: "small_thumbnail",
-            transformation: "w-150,h-150,fo-center,cm-resize"
+            transformation: "w-150,h-150,fo-center,cm-pad_resize"
           )
 
           puts(named_transformation)
@@ -8331,7 +8331,7 @@ paths:
             schema:
               $ref: "#/components/schemas/UpdateNamedTransformation"
             example:
-              transformation: "w-200,h-200,fo-center,cm-resize"
+              transformation: "w-200,h-200,fo-center,cm-pad_resize"
               enabled: false
       responses:
         "200":
@@ -8343,7 +8343,7 @@ paths:
               example:
                 id: "6bZ9x2ZUx"
                 name: "small_thumbnail"
-                transformation: "w-200,h-200,fo-center,cm-resize"
+                transformation: "w-200,h-200,fo-center,cm-pad_resize"
                 enabled: false
                 createdAt: "2024-01-10T09:00:00.000Z"
         "400":
@@ -8390,7 +8390,7 @@ paths:
           });
 
           const namedTransformation = await client.namedTransformations.update('6bZ9x2ZUx', {
-            transformation: 'w-200,h-200,fo-center,cm-resize',
+            transformation: 'w-200,h-200,fo-center,cm-pad_resize',
           });
 
           console.log(namedTransformation.id);
@@ -8405,7 +8405,7 @@ paths:
           named_transformation = client.named_transformations.update(
               id="6bZ9x2ZUx",
               enabled=False,
-              transformation="w-200,h-200,fo-center,cm-resize",
+              transformation="w-200,h-200,fo-center,cm-pad_resize",
           )
           print(named_transformation.id)
         go: |
@@ -8428,7 +8428,7 @@ paths:
           		context.TODO(),
           		"6bZ9x2ZUx",
           		imagekit.NamedTransformationUpdateParams{
-          			Transformation: imagekit.String("w-200,h-200,fo-center,cm-resize"),
+          			Transformation: imagekit.String("w-200,h-200,fo-center,cm-pad_resize"),
           		},
           	)
           	if err != nil {
@@ -10424,7 +10424,7 @@ components:
       minLength: 1
       description: |
         The transformation string this named transformation refers to. Learn more about the [transformation string syntax](https://imagekit.io/docs/transformations).
-      example: "w-150,h-150,fo-center,cm-resize"
+      example: "w-150,h-150,fo-center,cm-pad_resize"
     NamedTransformationEnabledField:
       type: boolean
       description: Whether the named transformation is currently enabled. When set to `false`, requests using this named transformation fail at delivery time.

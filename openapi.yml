@@ -4119,7 +4119,7 @@ paths:
                 - &a9
                   id: "6bZ9x2ZUx"
                   name: "small_thumbnail"
-                  transformation: "w-150,h-150,fo-center,cm-resize"
+                  transformation: "w-150,h-150,fo-center,cm-pad_resize"
                   enabled: true
                   createdAt: "2024-01-10T09:00:00.000Z"
         "401": *a1
@@ -4145,7 +4145,7 @@ paths:
               $ref: "#/components/schemas/CreateNamedTransformation"
             example:
               name: "small_thumbnail"
-              transformation: "w-150,h-150,fo-center,cm-resize"
+              transformation: "w-150,h-150,fo-center,cm-pad_resize"
               enabled: true
       responses:
         "201":
@@ -4255,7 +4255,7 @@ paths:
             schema:
               $ref: "#/components/schemas/UpdateNamedTransformation"
             example:
-              transformation: "w-200,h-200,fo-center,cm-resize"
+              transformation: "w-200,h-200,fo-center,cm-pad_resize"
               enabled: false
       responses:
         "200":
@@ -4267,7 +4267,7 @@ paths:
               example:
                 id: "6bZ9x2ZUx"
                 name: "small_thumbnail"
-                transformation: "w-200,h-200,fo-center,cm-resize"
+                transformation: "w-200,h-200,fo-center,cm-pad_resize"
                 enabled: false
                 createdAt: "2024-01-10T09:00:00.000Z"
         "400":
@@ -6202,7 +6202,7 @@ components:
       minLength: 1
       description: |
         The transformation string this named transformation refers to. Learn more about the [transformation string syntax](https://imagekit.io/docs/transformations).
-      example: "w-150,h-150,fo-center,cm-resize"
+      example: "w-150,h-150,fo-center,cm-pad_resize"
     NamedTransformationEnabledField:
       type: boolean
       description: Whether the named transformation is currently enabled. When set to `false`, requests using this named transformation fail at delivery time.
