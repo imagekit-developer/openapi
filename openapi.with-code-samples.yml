@@ -8206,6 +8206,7 @@ paths:
           in: path
           name: id
           required: true
+          description: Unique identifier of the named transformation. This is the `id` returned when the named transformation was created.
           schema:
             $ref: "#/components/schemas/NamedTransformationIdField"
       responses:
@@ -8225,7 +8226,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Invalid 'id' in path parameter
+                    example: Invalid `id` in path parameter.
                   help: *a10
         "401": *a1
         "403": *a2
@@ -10462,6 +10463,12 @@ components:
       description: |
         A named transformation is an alias for a transformation string, letting you apply and later update complex transformations without changing your image or video URLs. Learn more about [named transformations](https://imagekit.io/docs/transformations#named-transformations).
       type: object
+      required:
+        - id
+        - name
+        - transformation
+        - enabled
+        - createdAt
       properties:
         id:
           $ref: "#/components/schemas/NamedTransformationIdField"
