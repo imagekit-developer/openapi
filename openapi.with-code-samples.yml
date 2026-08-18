@@ -8558,6 +8558,172 @@ paths:
           result = image_kit.named_transformations.delete("6bZ9x2ZUx")
 
           puts(result)
+  /v1/ai-filter-search:
+    post:
+      tags:
+        - Digital Asset Management (DAM)
+      operationId: ai-filter-search
+      summary: AI filter search
+      description: |
+        Convert a natural-language prompt into a structured ImageKit media-library search query. The response returns a `searchQuery` string (the same Lucene-like syntax accepted by the list and search assets API) plus suggested filter parameters. This endpoint only generates the query; it does not execute the search.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+                  description: |
+                    Natural-language description of what to search for, e.g. "red dresses tagged summer uploaded last month".
+                currentFolder:
+                  type: string
+                  description: |
+                    Absolute path of the folder the user is currently in. Used to resolve relative references like "this folder" in the prompt.
+                timezone:
+                  type: string
+                  description: |
+                    IANA timezone (e.g. `Asia/Kolkata`) used to resolve relative date references in the prompt. Defaults to UTC when omitted.
+            example:
+              prompt: red dresses tagged summer uploaded last month
+              currentFolder: /products
+              timezone: Asia/Kolkata
+      responses:
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "200":
+          description: The generated search query and suggested filter parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  searchQuery:
+                    type: string
+                    description: |
+                      Generated query in ImageKit's Lucene-like syntax. Pass this as the `searchQuery` parameter to the list and search assets API. Empty string when no filters could be derived from the prompt.
+                  fileType:
+                    type: string
+                    description: |
+                      Suggested asset-type filter derived from the prompt. Empty string means no file-type restriction.
+                    enum:
+                      - ""
+                      - images
+                      - videos
+                      - cssJs
+                      - others
+                  isVersionIncludedInSearch:
+                    type: boolean
+                    description: |
+                      Whether previous file versions should be included in the search results.
+              example:
+                searchQuery: 'type = "file" AND tags IN ["summer"]'
+                fileType: images
+                isVersionIncludedInSearch: false
+        "400":
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "`prompt` is required."
+                  help:
+                    type: string
+                    example: For support kindly contact us at support@imagekit.io.
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const aiFilterSearch = await client.aiFilterSearch.create({
+            prompt: 'red dresses tagged summer uploaded last month',
+            currentFolder: '/products',
+            timezone: 'Asia/Kolkata',
+          });
+
+          console.log(aiFilterSearch.fileType);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          ai_filter_search = client.ai_filter_search.create(
+              prompt="red dresses tagged summer uploaded last month",
+              current_folder="/products",
+              timezone="Asia/Kolkata",
+          )
+          print(ai_filter_search.file_type)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	aiFilterSearch, err := client.AIFilterSearch.New(context.TODO(), imagekit.AIFilterSearchNewParams{
+          		Prompt:        "red dresses tagged summer uploaded last month",
+          		CurrentFolder: imagekit.String("/products"),
+          		Timezone:      imagekit.String("Asia/Kolkata"),
+          	})
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", aiFilterSearch.FileType)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.aifiltersearch.AiFilterSearchCreateParams;
+          import io.imagekit.models.aifiltersearch.AiFilterSearchCreateResponse;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  AiFilterSearchCreateParams params = AiFilterSearchCreateParams.builder()
+                      .prompt("red dresses tagged summer uploaded last month")
+                      .build();
+                  AiFilterSearchCreateResponse aiFilterSearch = client.aiFilterSearch().create(params);
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          ai_filter_search = image_kit.ai_filter_search.create(prompt: "red dresses tagged summer uploaded last month")
+
+          puts(ai_filter_search)
 components:
   schemas:
     BaseWebhookEvent:

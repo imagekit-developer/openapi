@@ -4336,6 +4336,88 @@ paths:
                     example: 'Named transformation "small_thumbnail" cannot be deleted because it is referenced by an upload pre-transformation or post-transformation setting.'
                   help: *a10
         "429": *a3
+  /v1/ai-filter-search:
+    post:
+      tags:
+        - Digital Asset Management (DAM)
+      operationId: ai-filter-search
+      summary: AI filter search
+      description: |
+        Convert a natural-language prompt into a structured ImageKit media-library search query. The response returns a `searchQuery` string (the same Lucene-like syntax accepted by the list and search assets API) plus suggested filter parameters. This endpoint only generates the query; it does not execute the search.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - prompt
+              properties:
+                prompt:
+                  type: string
+                  description: |
+                    Natural-language description of what to search for, e.g. "red dresses tagged summer uploaded last month".
+                currentFolder:
+                  type: string
+                  description: |
+                    Absolute path of the folder the user is currently in. Used to resolve relative references like "this folder" in the prompt.
+                timezone:
+                  type: string
+                  description: |
+                    IANA timezone (e.g. `Asia/Kolkata`) used to resolve relative date references in the prompt. Defaults to UTC when omitted.
+            example:
+              prompt: red dresses tagged summer uploaded last month
+              currentFolder: /products
+              timezone: Asia/Kolkata
+      responses:
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "200":
+          description: The generated search query and suggested filter parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  searchQuery:
+                    type: string
+                    description: |
+                      Generated query in ImageKit's Lucene-like syntax. Pass this as the `searchQuery` parameter to the list and search assets API. Empty string when no filters could be derived from the prompt.
+                  fileType:
+                    type: string
+                    description: |
+                      Suggested asset-type filter derived from the prompt. Empty string means no file-type restriction.
+                    enum:
+                      - ""
+                      - images
+                      - videos
+                      - cssJs
+                      - others
+                  isVersionIncludedInSearch:
+                    type: boolean
+                    description: |
+                      Whether previous file versions should be included in the search results.
+              example:
+                searchQuery: 'type = "file" AND tags IN ["summer"]'
+                fileType: images
+                isVersionIncludedInSearch: false
+        "400":
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "`prompt` is required."
+                  help:
+                    type: string
+                    example: For support kindly contact us at support@imagekit.io.
 components:
   schemas:
     BaseWebhookEvent:
