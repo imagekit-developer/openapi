@@ -12229,6 +12229,17 @@ components:
             By default, ImageKit removes all metadata during automatic image compression. 
             Set this to true to preserve metadata.
             See [Image metadata](https://imagekit.io/docs/image-optimization#image-metadata---md).
+        density:
+          oneOf:
+            - type: integer
+              minimum: 1
+              maximum: 1200
+            - type: string
+          description: |
+            Sets the output image density in dots per inch (DPI). Accepts an integer from 1 to 1200 or an arithmetic expression using the `idn` variable, such as `idn_mul_2`.
+            For raster images, this updates density metadata without changing dimensions. For vector images, it controls the DPI used during rasterization. Cannot be used inside layers.
+            See [Density](https://imagekit.io/docs/image-optimization#density---dn).
+          example: 300
         opacity:
           type: number
           minimum: 0
