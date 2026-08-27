@@ -948,6 +948,10 @@ paths:
               - DESC_SIZE
               - ASC_RELEVANCE
               - DESC_RELEVANCE
+              - ASC_DURATION
+              - DESC_DURATION
+              - ASC_ORIGINAL_CREATION_DATE
+              - DESC_ORIGINAL_CREATION_DATE
             default: ASC_CREATED
         - in: query
           name: path
@@ -6942,6 +6946,10 @@ components:
           maxLength: 500
           description: |
             Optional description of the custom metadata field. Only present when a description has been set. Shown as a hint to the users while setting the field's value on an asset in the media library UI.
+        reserved:
+          type: boolean
+          description: |
+            Present and set to `true` when the field is reserved. Omitted for regular fields. Reserved fields cannot be deleted.
         schema:
           type: object
           description: An object that describes the rules for the custom metadata field value.
