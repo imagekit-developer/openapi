@@ -1642,6 +1642,10 @@ paths:
               - DESC_SIZE
               - ASC_RELEVANCE
               - DESC_RELEVANCE
+              - ASC_DURATION
+              - DESC_DURATION
+              - ASC_ORIGINAL_CREATION_DATE
+              - DESC_ORIGINAL_CREATION_DATE
             default: ASC_CREATED
         - in: query
           name: path
@@ -11164,6 +11168,10 @@ components:
           maxLength: 500
           description: |
             Optional description of the custom metadata field. Only present when a description has been set. Shown as a hint to the users while setting the field's value on an asset in the media library UI.
+        reserved:
+          type: boolean
+          description: |
+            Present and set to `true` when the field is reserved. Omitted for regular fields. Reserved fields cannot be deleted.
         schema:
           type: object
           description: An object that describes the rules for the custom metadata field value.
@@ -12229,6 +12237,17 @@ components:
             By default, ImageKit removes all metadata during automatic image compression. 
             Set this to true to preserve metadata.
             See [Image metadata](https://imagekit.io/docs/image-optimization#image-metadata---md).
+        density:
+          oneOf:
+            - type: integer
+              minimum: 1
+              maximum: 1200
+            - type: string
+          description: |
+            Sets the output image density in dots per inch (DPI). Accepts an integer from 1 to 1200 or an arithmetic expression using the `idn` variable, such as `idn_mul_2`.
+            For raster images, this updates density metadata without changing dimensions. For vector images, it controls the DPI used during rasterization. Cannot be used inside layers.
+            See [Density](https://imagekit.io/docs/image-optimization#density---dn).
+          example: 300
         opacity:
           type: number
           minimum: 0
