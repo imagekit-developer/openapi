@@ -277,7 +277,10 @@ paths:
               properties:
                 name:
                   type: string
-                  description: API name of the custom metadata field. This should be unique across all (including deleted) custom metadata fields.
+                  description: |
+                    API name of the custom metadata field. This should be unique across all (including deleted) custom metadata fields.
+
+                    `_internal_original_created_datetime` is a reserved name and cannot be used. ImageKit creates that field automatically when you enable the original creation date setting in the media library settings.
                 label:
                   type: string
                   description: Human readable name of the custom metadata field. This should be unique across all non deleted custom metadata fields. This name is displayed as form field label to the users while setting field value on an asset in the media library UI.
@@ -931,6 +934,8 @@ paths:
           required: false
           description: |
             Sort the results by one of the supported fields in ascending or descending order.
+
+            `ASC_ORIGINAL_CREATION_DATE` and `DESC_ORIGINAL_CREATION_DATE` sort files by the value of the reserved `_internal_original_created_datetime` custom metadata field (labelled "Original creation date" in the dashboard). This field exists only after you enable the original creation date setting under the Custom Metadata tab of the media library settings. Files that have no value set for this field fall back to their upload time, so migrated assets carrying a preserved original date and natively uploaded assets are ordered together in a single timeline.
           schema:
             type: string
             enum:
@@ -4403,6 +4408,8 @@ components:
               type: object
               description: |
                 A key-value data to be associated with the asset. To unset a key, send `null` value for that key. Before setting any custom metadata on an asset you have to create the field using custom metadata fields API.
+
+                To preserve the original creation date of an asset migrated from another system, set the reserved `_internal_original_created_datetime` key to an ISO 8601 date string. This key is available once the original creation date setting is enabled in the media library settings.
               additionalProperties: true
             description:
               type: string
@@ -5558,6 +5565,8 @@ components:
           additionalProperties: true
           description: >
             JSON key-value pairs to associate with the asset. Create the custom metadata fields before setting these values.
+
+            To preserve the original creation date of an asset migrated from another system, set the reserved `_internal_original_created_datetime` key to an ISO 8601 date string. This key is available once the original creation date setting is enabled in the media library settings.
           example:
             brand: "Nike"
             color: "red"
@@ -5721,6 +5730,8 @@ components:
           additionalProperties: true
           description: >
             JSON key-value pairs to associate with the asset. Create the custom metadata fields before setting these values.
+
+            To preserve the original creation date of an asset migrated from another system, set the reserved `_internal_original_created_datetime` key to an ISO 8601 date string. This key is available once the original creation date setting is enabled in the media library settings.
           example:
             brand: "Nike"
             color: "red"
@@ -6949,7 +6960,11 @@ components:
         reserved:
           type: boolean
           description: |
-            Present and set to `true` when the field is reserved. Omitted for regular fields. Reserved fields cannot be deleted.
+            Present and set to `true` when the field is reserved, i.e. created and managed by ImageKit rather than by you. Omitted for regular fields.
+
+            Currently the only reserved field is `_internal_original_created_datetime` (label "Original creation date", type `Date`). ImageKit creates it when you enable the original creation date setting under the Custom Metadata tab of the media library settings in the dashboard. Use it to preserve the original creation date of assets migrated from another system: set its value through the `customMetadata` object in the upload or update file details API, then sort with `ASC_ORIGINAL_CREATION_DATE` or `DESC_ORIGINAL_CREATION_DATE` in the list and search assets API, or filter with `"customMetadata._internal_original_created_datetime"` in `searchQuery`.
+
+            Reserved fields cannot be deleted, and their name cannot be reused when creating a new field.
         schema:
           type: object
           description: An object that describes the rules for the custom metadata field value.
