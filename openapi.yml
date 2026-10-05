@@ -897,11 +897,6 @@ paths:
                     example: For support kindly contact us at support@imagekit.io.
         "204":
           description: Custom metadata field deleted successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                x-stainless-empty-object: true
   /v1/files:
     get:
       tags:
@@ -1344,11 +1339,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "204":
           description: File copied successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                x-stainless-empty-object: true
         "404":
           description: File not found.
           content:
@@ -1424,11 +1414,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "204":
           description: File moved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                x-stainless-empty-object: true
         "404":
           description: File not found.
           content:
@@ -1854,11 +1839,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "204":
           description: File version deleted successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                x-stainless-empty-object: true
         "400":
           description: Trying to delete the current version of the file.
           content:
@@ -2447,11 +2427,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "204":
           description: Folder deleted successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                x-stainless-empty-object: true
         "404":
           description: Folder not found
           content:
