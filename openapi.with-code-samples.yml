@@ -8512,6 +8512,634 @@ paths:
           result = image_kit.named_transformations.delete("6bZ9x2ZUx")
 
           puts(result)
+  /v1/accounts/webhooks:
+    get:
+      summary: List webhooks
+      tags:
+        - Account Management API
+        - Webhooks
+      operationId: list-webhooks
+      description: |
+        Returns an array of all webhooks configured for your account.
+      responses:
+        "200":
+          description: Array of webhook objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Webhook"
+              example:
+                - &whExample
+                  id: "65f1c2a9e4b0a1b2c3d4e5f6"
+                  endpoint: "https://example.com/imagekit/webhooks"
+                  events:
+                    - "video.transformation.ready"
+                    - "file.created"
+                  enabled: true
+                  secret: "whsec_WvVlXdM3rcNkRNJ1u4H8Qq0GmZ2FEb7p"
+                  createdAt: "2024-01-10T09:00:00.000Z"
+                  updatedAt: "2024-01-10T09:00:00.000Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const webhooks = await client.accounts.webhooks.list();
+
+          console.log(webhooks);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          webhooks = client.accounts.webhooks.list()
+          print(webhooks)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	webhooks, err := client.Accounts.Webhooks.List(context.TODO())
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", webhooks)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.accounts.webhooks.Webhook;
+          import io.imagekit.models.accounts.webhooks.WebhookListParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  List<Webhook> webhooks = client.accounts().webhooks().list();
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          webhooks = image_kit.accounts.webhooks.list
+
+          puts(webhooks)
+    post:
+      summary: Create webhook
+      tags:
+        - Account Management API
+        - Webhooks
+      operationId: create-webhook
+      description: |
+        Creates a new webhook and returns the created object, including the generated signing `secret`.
+
+        ImageKit sends a `POST` request to the webhook `endpoint` whenever one of the subscribed `events` occurs. Use the `secret` to verify the signature of each request. Learn more about [webhooks](https://imagekit.io/docs/webhooks).
+
+        You can create up to 3 webhooks per account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWebhook"
+            example:
+              endpoint: "https://example.com/imagekit/webhooks"
+              events:
+                - "video.transformation.ready"
+                - "file.created"
+      responses:
+        "201":
+          description: Webhook created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+              example: *whExample
+        "400":
+          description: Bad request. The request body failed validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "`endpoint` is required and must be a valid URL with the http or https protocol."
+                      - "`events` is required and must contain at least one event."
+                      - "`events` contains an unsupported event type."
+                      - "`events` must not contain duplicate event types."
+                      - "`enabled` must be a boolean."
+                      - "Your request must not contain any additional properties."
+                      - "You have reached the maximum limit of 3 webhooks allowed per account."
+                  help: &whHelp
+                    type: string
+                    example: For support kindly contact us at support@imagekit.io .
+        "409":
+          description: A webhook with this endpoint already exists, or another webhook is being created for this account at the same time.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "A webhook with the endpoint 'https://example.com/imagekit/webhooks' already exists."
+                      - "Another webhook is being created for this account. Please retry after some time."
+                  help: *whHelp
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const webhook = await client.accounts.webhooks.create({
+            endpoint: 'https://example.com/imagekit/webhooks',
+            events: ['video.transformation.ready', 'file.created'],
+          });
+
+          console.log(webhook.id);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          webhook = client.accounts.webhooks.create(
+              endpoint="https://example.com/imagekit/webhooks",
+              events=["video.transformation.ready", "file.created"],
+          )
+          print(webhook.id)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	webhook, err := client.Accounts.Webhooks.New(context.TODO(), imagekit.AccountWebhookNewParams{
+          		Endpoint: "https://example.com/imagekit/webhooks",
+          		Events:   []imagekit.WebhookEventType{imagekit.WebhookEventTypeVideoTransformationReady, imagekit.WebhookEventTypeFileCreated},
+          	})
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", webhook.ID)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.accounts.webhooks.Webhook;
+          import io.imagekit.models.accounts.webhooks.WebhookCreateParams;
+          import io.imagekit.models.accounts.webhooks.WebhookEventType;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  WebhookCreateParams params = WebhookCreateParams.builder()
+                      .endpoint("https://example.com/imagekit/webhooks")
+                      .addEvent(WebhookEventType.VIDEO_TRANSFORMATION_READY)
+                      .addEvent(WebhookEventType.FILE_CREATED)
+                      .build();
+                  Webhook webhook = client.accounts().webhooks().create(params);
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          webhook = image_kit.accounts.webhooks.create(
+            endpoint: "https://example.com/imagekit/webhooks",
+            events: [:"video.transformation.ready", :"file.created"]
+          )
+
+          puts(webhook)
+  /v1/accounts/webhooks/{id}:
+    get:
+      summary: Get webhook
+      tags:
+        - Account Management API
+        - Webhooks
+      operationId: get-webhook
+      description: Retrieves the webhook identified by `id`.
+      parameters:
+        - &whId
+          in: path
+          name: id
+          required: true
+          description: Unique identifier of the webhook. This is the `id` returned when the webhook was created.
+          schema:
+            $ref: "#/components/schemas/WebhookIdField"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+              example: *whExample
+        "400": &whInvalidId
+          description: Bad request. The `id` path parameter is malformed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid `id` in path parameter.
+                  help: *whHelp
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404": &whNotFound
+          description: Webhook not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Webhook with id "65f1c2a9e4b0a1b2c3d4e5f6" not found.'
+                  help: *whHelp
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const webhook = await client.accounts.webhooks.get('65f1c2a9e4b0a1b2c3d4e5f6');
+
+          console.log(webhook.id);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          webhook = client.accounts.webhooks.get(
+              "65f1c2a9e4b0a1b2c3d4e5f6",
+          )
+          print(webhook.id)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	webhook, err := client.Accounts.Webhooks.Get(context.TODO(), "65f1c2a9e4b0a1b2c3d4e5f6")
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", webhook.ID)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.accounts.webhooks.Webhook;
+          import io.imagekit.models.accounts.webhooks.WebhookGetParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  Webhook webhook = client.accounts().webhooks().get("65f1c2a9e4b0a1b2c3d4e5f6");
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          webhook = image_kit.accounts.webhooks.get("65f1c2a9e4b0a1b2c3d4e5f6")
+
+          puts(webhook)
+    patch:
+      summary: Update webhook
+      tags:
+        - Account Management API
+        - Webhooks
+      operationId: update-webhook
+      description: |
+        Updates the webhook identified by `id` and returns the updated object. Only the fields included in the request body are changed.
+
+        When `events` is provided, it replaces the existing list of subscribed events. The signing `secret` can't be changed.
+      parameters:
+        - *whId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWebhook"
+            example:
+              events:
+                - "video.transformation.ready"
+                - "video.transformation.error"
+              enabled: false
+      responses:
+        "200":
+          description: Webhook updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+              example:
+                id: "65f1c2a9e4b0a1b2c3d4e5f6"
+                endpoint: "https://example.com/imagekit/webhooks"
+                events:
+                  - "video.transformation.ready"
+                  - "video.transformation.error"
+                enabled: false
+                secret: "whsec_WvVlXdM3rcNkRNJ1u4H8Qq0GmZ2FEb7p"
+                createdAt: "2024-01-10T09:00:00.000Z"
+                updatedAt: "2024-02-01T12:30:00.000Z"
+        "400":
+          description: Bad request. The request body or `id` path parameter failed validation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - "`endpoint` must be a valid URL with the http or https protocol."
+                      - "`events` must contain at least one event."
+                      - "`events` contains an unsupported event type."
+                      - "`events` must not contain duplicate event types."
+                      - "`enabled` must be a boolean."
+                      - "Your request must contain at least one of `endpoint`, `events` or `enabled`."
+                      - "Your request must not contain any additional properties."
+                      - "Invalid `id` in path parameter."
+                  help: *whHelp
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404": *whNotFound
+        "409":
+          description: Another webhook with this endpoint already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "A webhook with the endpoint 'https://example.com/imagekit/webhooks' already exists."
+                  help: *whHelp
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const webhook = await client.accounts.webhooks.update('65f1c2a9e4b0a1b2c3d4e5f6', {
+            events: ['video.transformation.ready', 'video.transformation.error'],
+          });
+
+          console.log(webhook.id);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          webhook = client.accounts.webhooks.update(
+              id="65f1c2a9e4b0a1b2c3d4e5f6",
+              enabled=False,
+              events=["video.transformation.ready", "video.transformation.error"],
+          )
+          print(webhook.id)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	webhook, err := client.Accounts.Webhooks.Update(
+          		context.TODO(),
+          		"65f1c2a9e4b0a1b2c3d4e5f6",
+          		imagekit.AccountWebhookUpdateParams{
+          			Events: []imagekit.WebhookEventType{imagekit.WebhookEventTypeVideoTransformationReady, imagekit.WebhookEventTypeVideoTransformationError},
+          		},
+          	)
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", webhook.ID)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.accounts.webhooks.Webhook;
+          import io.imagekit.models.accounts.webhooks.WebhookUpdateParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  Webhook webhook = client.accounts().webhooks().update("65f1c2a9e4b0a1b2c3d4e5f6");
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          webhook = image_kit.accounts.webhooks.update("65f1c2a9e4b0a1b2c3d4e5f6")
+
+          puts(webhook)
+    delete:
+      summary: Delete webhook
+      tags:
+        - Account Management API
+        - Webhooks
+      operationId: delete-webhook
+      description: |
+        Permanently deletes the webhook identified by `id`. ImageKit stops sending events to its endpoint.
+      parameters:
+        - *whId
+      responses:
+        "204":
+          description: Webhook deleted successfully.
+        "400": *whInvalidId
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404": *whNotFound
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          await client.accounts.webhooks.delete('65f1c2a9e4b0a1b2c3d4e5f6');
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          client.accounts.webhooks.delete(
+              "65f1c2a9e4b0a1b2c3d4e5f6",
+          )
+        go: |
+          package main
+
+          import (
+          	"context"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	err := client.Accounts.Webhooks.Delete(context.TODO(), "65f1c2a9e4b0a1b2c3d4e5f6")
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.accounts.webhooks.WebhookDeleteParams;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  client.accounts().webhooks().delete("65f1c2a9e4b0a1b2c3d4e5f6");
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          result = image_kit.accounts.webhooks.delete("65f1c2a9e4b0a1b2c3d4e5f6")
+
+          puts(result)
 components:
   schemas:
     BaseWebhookEvent:
@@ -10443,6 +11071,118 @@ components:
           format: date-time
           description: |
             ISO 8601 timestamp of when the named transformation was created.
+          example: "2024-01-10T09:00:00.000Z"
+    WebhookIdField:
+      type: string
+      description: Unique identifier for a webhook.
+      example: "65f1c2a9e4b0a1b2c3d4e5f6"
+    WebhookEndpointField:
+      type: string
+      format: uri
+      description: |
+        The URL where ImageKit sends webhook events as `POST` requests. Must use the `http` or `https` protocol, and must be unique across all webhooks for your account.
+      example: "https://example.com/imagekit/webhooks"
+    WebhookEventType:
+      type: string
+      description: |
+        A webhook event type. Learn more about the payload of each [webhook event](https://imagekit.io/docs/webhooks#list-of-events).
+      enum:
+        - video.transformation.accepted
+        - video.transformation.ready
+        - video.transformation.error
+        - upload.pre-transform.success
+        - upload.pre-transform.error
+        - upload.post-transform.success
+        - upload.post-transform.error
+        - file.created
+        - file.updated
+        - file.deleted
+        - file-version.created
+        - file-version.deleted
+    WebhookEventsField:
+      type: array
+      minItems: 1
+      uniqueItems: true
+      description: |
+        The event types this webhook is subscribed to. ImageKit sends a request to the `endpoint` only for these events.
+      items:
+        $ref: "#/components/schemas/WebhookEventType"
+      example:
+        - "video.transformation.ready"
+        - "file.created"
+    WebhookEnabledField:
+      type: boolean
+      description: Whether the webhook is enabled. When `false`, ImageKit doesn't send any events to the `endpoint`.
+      example: true
+    CreateWebhook:
+      title: Create Webhook
+      type: object
+      required:
+        - endpoint
+        - events
+      additionalProperties: false
+      properties:
+        endpoint:
+          $ref: "#/components/schemas/WebhookEndpointField"
+        events:
+          $ref: "#/components/schemas/WebhookEventsField"
+        enabled:
+          $ref: "#/components/schemas/WebhookEnabledField"
+          default: true
+    UpdateWebhook:
+      title: Update Webhook
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        endpoint:
+          $ref: "#/components/schemas/WebhookEndpointField"
+        events:
+          $ref: "#/components/schemas/WebhookEventsField"
+          description: |
+            The event types this webhook is subscribed to. Replaces the existing list. Omit to leave the current value unchanged.
+        enabled:
+          $ref: "#/components/schemas/WebhookEnabledField"
+          description: |
+            Whether the webhook is enabled. Omit to leave the current value unchanged.
+    Webhook:
+      title: Webhook
+      description: |
+        A webhook is an HTTP endpoint that ImageKit notifies when subscribed events occur in your account. Learn more about [webhooks](https://imagekit.io/docs/webhooks).
+      type: object
+      required:
+        - id
+        - endpoint
+        - events
+        - enabled
+        - secret
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: "#/components/schemas/WebhookIdField"
+        endpoint:
+          $ref: "#/components/schemas/WebhookEndpointField"
+        events:
+          $ref: "#/components/schemas/WebhookEventsField"
+        enabled:
+          $ref: "#/components/schemas/WebhookEnabledField"
+        secret:
+          type: string
+          description: |
+            Signing secret generated by ImageKit, used to verify that webhook requests come from ImageKit. Starts with `whsec_`. This value can't be set or changed through the API. Learn more about [verifying webhook signatures](https://imagekit.io/docs/webhooks#verify-webhook-signature).
+          example: "whsec_WvVlXdM3rcNkRNJ1u4H8Qq0GmZ2FEb7p"
+        createdAt:
+          type: string
+          format: date-time
+          description: |
+            ISO 8601 timestamp of when the webhook was created.
+          example: "2024-01-10T09:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: |
+            ISO 8601 timestamp of when the webhook was last updated.
           example: "2024-01-10T09:00:00.000Z"
     Extensions:
       title: Extensions Array
