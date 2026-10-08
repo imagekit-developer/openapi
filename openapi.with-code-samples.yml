@@ -8668,7 +8668,7 @@ paths:
                     type: string
                     example: For support kindly contact us at support@imagekit.io .
         "409":
-          description: A webhook with this endpoint already exists.
+          description: A webhook with this endpoint already exists, or another webhook is being created for this account at the same time.
           content:
             application/json:
               schema:
@@ -8676,7 +8676,9 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "A webhook with the endpoint 'https://example.com/imagekit/webhooks' already exists."
+                    examples:
+                      - "A webhook with the endpoint 'https://example.com/imagekit/webhooks' already exists."
+                      - "Another webhook is being created for this account. Please retry after some time."
                   help: *whHelp
         "401":
           $ref: "#/components/responses/Unauthorized"
