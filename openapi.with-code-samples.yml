@@ -10662,6 +10662,17 @@ components:
           format: date-time
           description: |
             Date and time when the folder was last updated. The date and time is in ISO8601 format.
+        createdBy:
+          type: object
+          description: |
+            Details of the user who created the folder. Present only when this information is available. The `name` is the name of the user at the time of folder creation.
+          properties:
+            name:
+              type: string
+              description: Name of the user who created the folder.
+            email:
+              type: string
+              description: Email of the user who created the folder.
     SelectedFieldsSchema:
       type: object
       description: |
@@ -11778,10 +11789,10 @@ components:
     FolderDeleteData:
       type: object
       properties:
-        id:
+        folderId:
           type: string
-          description: The unique identifier of the deleted folder.
-      required: [ id ]
+          description: The unique `folderId` of the deleted folder.
+      required: [ folderId ]
 
     SrcOptions:
       title: Source Options
