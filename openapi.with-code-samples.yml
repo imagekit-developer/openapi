@@ -11099,6 +11099,9 @@ components:
         - file.deleted
         - file-version.created
         - file-version.deleted
+        - folder.created
+        - folder.updated
+        - folder.deleted
     WebhookEventsField:
       type: array
       minItems: 1
