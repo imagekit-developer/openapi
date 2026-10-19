@@ -10662,6 +10662,17 @@ components:
           format: date-time
           description: |
             Date and time when the folder was last updated. The date and time is in ISO8601 format.
+        createdBy:
+          type: object
+          description: |
+            Details of the user who created the folder. Present only when this information is available. The `name` is the name of the user at the time of folder creation.
+          properties:
+            name:
+              type: string
+              description: Name of the user who created the folder.
+            email:
+              type: string
+              description: Email of the user who created the folder.
     SelectedFieldsSchema:
       type: object
       description: |
@@ -11717,6 +11728,71 @@ components:
                   description: The unique `versionId` of the deleted file version.
               required: [ fileId, versionId ]
           required: [ type, created_at, data ]
+
+    FolderCreateEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseWebhookEvent"
+        - type: object
+          description: |
+            Triggered when a folder is created, whether explicitly, by copying or moving a folder, or implicitly when an upload creates missing parent folders. Copying or moving a folder tree sends one event per folder in the tree.
+          properties:
+            type:
+              type: string
+              const: "folder.created"
+              description: Type of the webhook event.
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp of when the event occurred in ISO8601 format.
+            data:
+              $ref: "#/components/schemas/FolderDetails"
+          required: [ type, created_at, data ]
+
+    FolderUpdateEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseWebhookEvent"
+        - type: object
+          description: |
+            Triggered when a folder is updated, for example when its custom metadata changes or it is renamed. Renaming a folder sends one event per folder in the tree, each with its new `folderPath`.
+          properties:
+            type:
+              type: string
+              const: "folder.updated"
+              description: Type of the webhook event.
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp of when the event occurred in ISO8601 format.
+            data:
+              $ref: "#/components/schemas/FolderDetails"
+          required: [ type, created_at, data ]
+
+    FolderDeleteEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseWebhookEvent"
+        - type: object
+          description: |
+            Triggered when a folder is deleted. Deleting a folder tree sends one event per folder in the tree; the files inside it send `file.deleted` events. Moving a folder sends this event for the old `folderId` and `folder.created` for the new one.
+          properties:
+            type:
+              type: string
+              const: "folder.deleted"
+              description: Type of the webhook event.
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp of when the event occurred in ISO8601 format.
+            data:
+              $ref: "#/components/schemas/FolderDeleteData"
+          required: [ type, created_at, data ]
+
+    FolderDeleteData:
+      type: object
+      properties:
+        folderId:
+          type: string
+          description: The unique `folderId` of the deleted folder.
+      required: [ folderId ]
 
     SrcOptions:
       title: Source Options
@@ -14002,6 +14078,54 @@ webhooks:
           application/json:
             schema:
               $ref: "#/components/schemas/FileVersionDeleteEvent"
+      responses:
+        "200":
+          description: Acknowledge
+
+  folder.created:
+    post:
+      operationId: folder-created
+      summary: Folder created
+      description: |
+        Triggered when a folder is created, whether explicitly, by copying or moving a folder, or implicitly when an upload creates missing parent folders. Copying or moving a folder tree sends one event per folder in the tree.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderCreateEvent"
+      responses:
+        "200":
+          description: Acknowledge
+
+  folder.updated:
+    post:
+      operationId: folder-updated
+      summary: Folder updated
+      description: |
+        Triggered when a folder is updated, for example when its custom metadata changes or it is renamed. Renaming a folder sends one event per folder in the tree, each with its new `folderPath`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderUpdateEvent"
+      responses:
+        "200":
+          description: Acknowledge
+
+  folder.deleted:
+    post:
+      operationId: folder-deleted
+      summary: Folder deleted
+      description: |
+        Triggered when a folder is deleted. Deleting a folder tree sends one event per folder in the tree; the files inside it send `file.deleted` events. Moving a folder sends this event for the old `folderId` and `folder.created` for the new one.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FolderDeleteEvent"
       responses:
         "200":
           description: Acknowledge
