@@ -7542,7 +7542,7 @@ components:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
           description: |
-            Triggered when a folder is created.
+            Triggered when a folder is created, whether explicitly, by copying or moving a folder, or implicitly when an upload creates missing parent folders. Copying or moving a folder tree sends one event per folder in the tree.
           properties:
             type:
               type: string
@@ -7561,7 +7561,7 @@ components:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
           description: |
-            Triggered when a folder is updated.
+            Triggered when a folder is updated, for example when its custom metadata changes or it is renamed. Renaming a folder sends one event per folder in the tree, each with its new `folderPath`.
           properties:
             type:
               type: string
@@ -7580,7 +7580,7 @@ components:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
           description: |
-            Triggered when a folder is deleted.
+            Triggered when a folder is deleted. Deleting a folder tree sends one event per folder in the tree; the files inside it send `file.deleted` events and their versions send `file-version.deleted` events. Moving a folder sends this event for the old `folderId` and `folder.created` for the new one.
           properties:
             type:
               type: string
@@ -9895,7 +9895,7 @@ webhooks:
       operationId: folder-created
       summary: Folder created
       description: |
-        Triggered when a folder is created.
+        Triggered when a folder is created, whether explicitly, by copying or moving a folder, or implicitly when an upload creates missing parent folders. Copying or moving a folder tree sends one event per folder in the tree.
       requestBody:
         required: true
         content:
@@ -9911,7 +9911,7 @@ webhooks:
       operationId: folder-updated
       summary: Folder updated
       description: |
-        Triggered when a folder is updated.
+        Triggered when a folder is updated, for example when its custom metadata changes or it is renamed. Renaming a folder sends one event per folder in the tree, each with its new `folderPath`.
       requestBody:
         required: true
         content:
@@ -9927,7 +9927,7 @@ webhooks:
       operationId: folder-deleted
       summary: Folder deleted
       description: |
-        Triggered when a folder is deleted.
+        Triggered when a folder is deleted. Deleting a folder tree sends one event per folder in the tree; the files inside it send `file.deleted` events and their versions send `file-version.deleted` events. Moving a folder sends this event for the old `folderId` and `folder.created` for the new one.
       requestBody:
         required: true
         content:
