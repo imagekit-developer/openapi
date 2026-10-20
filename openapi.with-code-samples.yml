@@ -9148,10 +9148,7 @@ components:
         id:
           type: string
           description: Unique identifier for the event.
-        type:
-          type: string
-          description: The type of webhook event.
-      required: [ id, type ]
+      required: [ id ]
 
     UpdateFileRequest:
       title: Update file request
@@ -11388,9 +11385,8 @@ components:
           type: string
           description: Name of the asset.
         customMetadata:
-          type: object
           description: An object with custom metadata for the folder. Returns empty object if no custom metadata is set.
-          additionalProperties: true
+          $ref: "#/components/schemas/CustomMetadata"
         folderPath:
           type: string
           description: |
