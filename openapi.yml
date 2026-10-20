@@ -7484,6 +7484,7 @@ components:
 
     # ---- Event: accepted ----
     VideoTransformationAcceptedEvent:
+      x-stainless-variantName: VideoTransformationAccepted
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7511,6 +7512,7 @@ components:
 
     # ---- Event: ready ----
     VideoTransformationReadyEvent:
+      x-stainless-variantName: VideoTransformationReady
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7577,6 +7579,7 @@ components:
 
     # ---- Event: error ----
     VideoTransformationErrorEvent:
+      x-stainless-variantName: VideoTransformationError
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7632,6 +7635,7 @@ components:
       required: [ x_request_id, transformation ]
 
     UploadPreTransformSuccessEvent:
+      x-stainless-variantName: UploadPreTransformSuccess
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7652,6 +7656,7 @@ components:
           required: [ type, created_at, request, data ]
 
     UploadPreTransformErrorEvent:
+      x-stainless-variantName: UploadPreTransformError
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7717,6 +7722,7 @@ components:
       required: [ x_request_id, transformation ]
 
     UploadPostTransformSuccessEvent:
+      x-stainless-variantName: UploadPostTransformSuccess
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7749,6 +7755,7 @@ components:
           required: [ type, created_at, request, data ]
 
     UploadPostTransformErrorEvent:
+      x-stainless-variantName: UploadPostTransformError
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7796,6 +7803,7 @@ components:
           required: [ type, created_at, request, data ]
 
     FileCreateEvent:
+      x-stainless-variantName: FileCreate
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7815,6 +7823,7 @@ components:
           required: [ type, created_at, data ]
 
     FileUpdateEvent:
+      x-stainless-variantName: FileUpdate
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7834,6 +7843,7 @@ components:
           required: [ type, created_at, data ]
 
     FileVersionCreateEvent:
+      x-stainless-variantName: FileVersionCreate
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7853,6 +7863,7 @@ components:
           required: [ type, created_at, data ]
 
     FileDeleteEvent:
+      x-stainless-variantName: FileDelete
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7877,6 +7888,7 @@ components:
           required: [ type, created_at, data ]
 
     FileVersionDeleteEvent:
+      x-stainless-variantName: FileVersionDelete
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7904,6 +7916,7 @@ components:
           required: [ type, created_at, data ]
 
     FolderCreateEvent:
+      x-stainless-variantName: FolderCreate
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7923,6 +7936,7 @@ components:
           required: [ type, created_at, data ]
 
     FolderUpdateEvent:
+      x-stainless-variantName: FolderUpdate
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
@@ -7942,6 +7956,7 @@ components:
           required: [ type, created_at, data ]
 
     FolderDeleteEvent:
+      x-stainless-variantName: FolderDelete
       allOf:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
