@@ -4203,7 +4203,6 @@ paths:
                       - Your request contains invalid value for search parameter. Maximum length is 100 characters.
                       - Your request contains invalid value for limit parameter. It must be an integer between 1 and 1000.
                       - Your request contains invalid value for cursor parameter. Use the nextCursor value from a previous response with the same tagSource, fileType, sort, search and prefix.
-                      - Your request contains the unsupported parameter type. File versions are always included.
                   help:
                     type: string
                     example: For support kindly contact us at support@imagekit.io.
