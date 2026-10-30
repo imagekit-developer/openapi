@@ -8124,6 +8124,170 @@ paths:
 
           puts(usage_analytics_response)
 
+  /v1/accounts/contract:
+    get:
+      tags:
+        - Account Management API
+      operationId: get-contract
+      summary: Get contract consumption
+      description: |
+        Get the account's contract terms and the usage consumed against them in the current contract term. Bandwidth is in bytes; video processing units, extension units and purge cache requests are counts.
+
+        For an agency account, consumption includes the child accounts billed to it. A child account billed to its parent cannot call this endpoint; call it with the parent account's credentials instead.
+
+        Contract terms are read live; consumption is refreshed periodically, not on every request. Use `asOf` to check how fresh it is. Contracts of one month or less are reported as `hasContract: false`. The response is cached for 5 minutes per account.
+
+        Requires an API key with account management access.
+      responses:
+        "200":
+          description: Contract terms and consumption.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - hasContract
+                properties:
+                  hasContract:
+                    type: boolean
+                    description: Whether the account has an active contract. The other fields are present only when it does.
+                  contractMonths:
+                    type: integer
+                    description: Length of each contract term in months.
+                  originalContractStartDate:
+                    type: string
+                    format: date
+                    description: Start date of the first contract term.
+                  effectiveContractStartDate:
+                    type: string
+                    format: date
+                    description: Start date of the current contract term. It moves forward when the contract renews.
+                  effectiveContractEndDate:
+                    type: string
+                    format: date
+                    description: End date of the current contract term.
+                  quota:
+                    $ref: "#/components/schemas/ContractUnits"
+                    description: Usage included in the current contract term.
+                  consumed:
+                    $ref: "#/components/schemas/ContractUnits"
+                    description: Usage consumed in the current contract term. For an agency account, this includes the child accounts billed to it.
+                  asOf:
+                    type: [ string, null ]
+                    format: date-time
+                    description: When `consumed` was last computed. `null` if it has not been computed for the contract yet; `consumed` is then all zeros.
+              examples:
+                default:
+                  value:
+                    hasContract: true
+                    contractMonths: 12
+                    originalContractStartDate: "2025-04-01"
+                    effectiveContractStartDate: "2026-04-01"
+                    effectiveContractEndDate: "2027-03-31"
+                    quota:
+                      bandwidthBytes: 536870912000000
+                      videoProcessingUnitsCount: 2000000
+                      extensionUnitsCount: 100000
+                      purgeCacheRequests: 0
+                    consumed:
+                      bandwidthBytes: 229190589617275
+                      videoProcessingUnitsCount: 812004
+                      extensionUnitsCount: 40211
+                      purgeCacheRequests: 0
+                    asOf: "2026-10-27T09:00:00.000Z"
+                noContract:
+                  value:
+                    hasContract: false
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - Your account cannot be authenticated.
+                      - Your request contains expired private API key.
+                      - Your account is disabled.
+                      - This account is billed to its parent account. Contract details are available on the parent account.
+                  help:
+                    type: string
+                    example: For support kindly contact us at support@imagekit.io.
+      x-stainless-snippets:
+        typescript: |-
+          import ImageKit from '@imagekit/nodejs';
+
+          const client = new ImageKit({
+            privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
+            password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
+          });
+
+          const contract = await client.accounts.contract.get();
+
+          console.log(contract.hasContract);
+        python: |-
+          import os
+          from imagekitio import ImageKit
+
+          client = ImageKit(
+              private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
+              password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
+          )
+          contract = client.accounts.contract.get()
+          print(contract.has_contract)
+        go: |
+          package main
+
+          import (
+          	"context"
+          	"fmt"
+
+          	"github.com/imagekit-developer/imagekit-go/v2"
+          	"github.com/imagekit-developer/imagekit-go/v2/option"
+          )
+
+          func main() {
+          	client := imagekit.NewClient(
+          		option.WithPrivateKey("My Private Key"),
+          		option.WithPassword("My Password"),
+          	)
+          	contract, err := client.Accounts.Contract.Get(context.TODO())
+          	if err != nil {
+          		panic(err.Error())
+          	}
+          	fmt.Printf("%+v\n", contract.HasContract)
+          }
+        java: |-
+          package io.imagekit.example;
+
+          import io.imagekit.client.ImageKitClient;
+          import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.accounts.contract.ContractGetParams;
+          import io.imagekit.models.accounts.contract.ContractGetResponse;
+
+          public final class Main {
+              private Main() {}
+
+              public static void main(String[] args) {
+                  ImageKitClient client = ImageKitOkHttpClient.fromEnv();
+
+                  ContractGetResponse contract = client.accounts().contract().get();
+              }
+          }
+        ruby: |-
+          require "imagekitio"
+
+          image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
+
+          contract = image_kit.accounts.contract.get
+
+          puts(contract)
   /v1/named-transformations:
     get:
       summary: List named transformations
@@ -10313,6 +10477,10 @@ components:
                   example: true
                   default: false
                   type: boolean
+                useImprovedLayerSpec:
+                  description: Whether to always rewrite Cloudinary layers to the improved ImageKit layer specification (`l-image`, `l-text`, ..., `l-end`). When `false` or omitted, the improved specification is used only for transformations that require it.
+                  example: true
+                  type: boolean
               required:
                 - type
               additionalProperties: false
@@ -10381,6 +10549,10 @@ components:
                   description: Whether to preserve `<asset_type>/<delivery_type>` in the rewritten URL.
                   example: true
                   default: false
+                  type: boolean
+                useImprovedLayerSpec:
+                  description: Whether to always rewrite Cloudinary layers to the improved ImageKit layer specification (`l-image`, `l-text`, ..., `l-end`). When `false` or omitted, the improved specification is used only for transformations that require it.
+                  example: true
                   type: boolean
               required:
                 - type
@@ -11462,7 +11634,7 @@ components:
           description: When the tag was last applied to an asset matching the `tagSource` and `fileType` filters of the request, in ISO 8601 format.
         assetCount:
           type: integer
-          description: The number of assets carrying the tag, counted across both tag sources and all file types regardless of the request's filters.
+          description: The number of assets carrying the tag, counted across both tag sources (user-generated tags and AI-generated tags) and all file types regardless of the request's filters.
       required:
         - name
         - label
@@ -13817,6 +13989,26 @@ components:
             Only works if the base asset is an image. See [gradient](https://imagekit.io/docs/effects-and-enhancements#gradient---e-gradient).
       additionalProperties: false
 
+    ContractUnits:
+      type: object
+      required:
+        - bandwidthBytes
+        - videoProcessingUnitsCount
+        - extensionUnitsCount
+        - purgeCacheRequests
+      properties:
+        bandwidthBytes:
+          type: integer
+          description: Bandwidth in bytes.
+        videoProcessingUnitsCount:
+          type: integer
+          description: Number of video processing units.
+        extensionUnitsCount:
+          type: integer
+          description: Number of extension units.
+        purgeCacheRequests:
+          type: integer
+          description: Number of purge cache requests.
     UsageAnalyticsResponse:
       type: object
       properties:
