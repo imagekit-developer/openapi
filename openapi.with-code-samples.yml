@@ -4141,6 +4141,8 @@ paths:
             minimum: 1
             maximum: 1000
             default: 1000
+          x-stainless-pagination-property:
+            purpose: max_per_page
         - in: query
           name: cursor
           required: false
@@ -4148,6 +4150,8 @@ paths:
             The `nextCursor` value from the previous response, to fetch the next page. A cursor is bound to the `tagSource`, `fileType`, `sort`, `search` and `prefix` it was issued with; sending it with different values returns a 400.
           schema:
             type: string
+          x-stainless-pagination-property:
+            purpose: next_cursor_param
       responses:
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
@@ -4167,9 +4171,13 @@ paths:
                     description: Tags matching the request, in the requested order.
                     items:
                       $ref: "#/components/schemas/Tag"
+                    x-stainless-pagination-property:
+                      purpose: items
                   nextCursor:
                     type: [ string, null ]
                     description: Cursor for the next page, or `null` when there are no more tags.
+                    x-stainless-pagination-property:
+                      purpose: next_cursor_field
                 required:
                   - tags
                   - nextCursor
@@ -4217,9 +4225,10 @@ paths:
             password: process.env['OPTIONAL_IMAGEKIT_IGNORES_THIS'], // This is the default and can be omitted
           });
 
-          const tags = await client.tags.list();
-
-          console.log(tags.nextCursor);
+          // Automatically fetches more pages as needed.
+          for await (const tag of client.tags.list()) {
+            console.log(tag.assetCount);
+          }
         python: |-
           import os
           from imagekitio import ImageKit
@@ -4228,8 +4237,9 @@ paths:
               private_key=os.environ.get("IMAGEKIT_PRIVATE_KEY"),  # This is the default and can be omitted
               password=os.environ.get("OPTIONAL_IMAGEKIT_IGNORES_THIS"),  # This is the default and can be omitted
           )
-          tags = client.tags.list()
-          print(tags.next_cursor)
+          page = client.tags.list()
+          page = page.tags[0]
+          print(page.asset_count)
         go: |
           package main
 
@@ -4246,19 +4256,19 @@ paths:
           		option.WithPrivateKey("My Private Key"),
           		option.WithPassword("My Password"),
           	)
-          	tags, err := client.Tags.List(context.TODO(), imagekit.TagListParams{})
+          	page, err := client.Tags.List(context.TODO(), imagekit.TagListParams{})
           	if err != nil {
           		panic(err.Error())
           	}
-          	fmt.Printf("%+v\n", tags.NextCursor)
+          	fmt.Printf("%+v\n", page)
           }
         java: |-
           package io.imagekit.example;
 
           import io.imagekit.client.ImageKitClient;
           import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+          import io.imagekit.models.tags.TagListPage;
           import io.imagekit.models.tags.TagListParams;
-          import io.imagekit.models.tags.TagListResponse;
 
           public final class Main {
               private Main() {}
@@ -4266,7 +4276,7 @@ paths:
               public static void main(String[] args) {
                   ImageKitClient client = ImageKitOkHttpClient.fromEnv();
 
-                  TagListResponse tags = client.tags().list();
+                  TagListPage page = client.tags().list();
               }
           }
         ruby: |-
@@ -4274,9 +4284,9 @@ paths:
 
           image_kit = Imagekitio::Client.new(private_key: "My Private Key", password: "My Password")
 
-          tags = image_kit.tags.list
+          page = image_kit.tags.list
 
-          puts(tags)
+          puts(page)
   /v1/folder:
     post:
       tags:

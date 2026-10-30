@@ -2422,6 +2422,8 @@ paths:
             minimum: 1
             maximum: 1000
             default: 1000
+          x-stainless-pagination-property:
+            purpose: max_per_page
         - in: query
           name: cursor
           required: false
@@ -2429,6 +2431,8 @@ paths:
             The `nextCursor` value from the previous response, to fetch the next page. A cursor is bound to the `tagSource`, `fileType`, `sort`, `search` and `prefix` it was issued with; sending it with different values returns a 400.
           schema:
             type: string
+          x-stainless-pagination-property:
+            purpose: next_cursor_param
       responses:
         "429":
           $ref: "#/components/responses/RateLimitExceeded"
@@ -2448,9 +2452,13 @@ paths:
                     description: Tags matching the request, in the requested order.
                     items:
                       $ref: "#/components/schemas/Tag"
+                    x-stainless-pagination-property:
+                      purpose: items
                   nextCursor:
                     type: [ string, null ]
                     description: Cursor for the next page, or `null` when there are no more tags.
+                    x-stainless-pagination-property:
+                      purpose: next_cursor_field
                 required:
                   - tags
                   - nextCursor
