@@ -11498,6 +11498,9 @@ components:
         - video.transformation.accepted
         - video.transformation.ready
         - video.transformation.error
+        - image.async-transformation.accepted
+        - image.async-transformation.ready
+        - image.async-transformation.error
         - upload.pre-transform.success
         - upload.pre-transform.error
         - upload.post-transform.success
@@ -12613,6 +12616,183 @@ components:
                                 - `download_failed`: Could not download source video
                                 - `internal_server_error`: Unexpected server error
                               enum: [ encoding_failed, download_failed, internal_server_error ]
+                          required: [ reason ]
+              required: [ asset, transformation ]
+          required: [ type, created_at, request, data ]
+
+    ImageWebhookRequestInfo:
+      type: object
+      description: Information about the original request that triggered the image transformation.
+      properties:
+        x_request_id:
+          type: string
+          description: Unique identifier for the originating transformation request.
+        url:
+          type: string
+          format: uri
+          description: Full URL of the transformation request that was submitted.
+        user_agent:
+          type: string
+          description: User-Agent header from the original request that triggered the transformation.
+      required: [ x_request_id, url ]
+
+    ImageAsset:
+      type: object
+      description: Information about the source image asset being transformed.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL of the source image, without the transformation.
+      required: [ url ]
+
+    ImageTransformationBase:
+      type: object
+      description: Base information about an image transformation request.
+      properties:
+        type:
+          type: string
+          enum: [ image-transformation ]
+          description: Type of transformation. Always `image-transformation`.
+        options:
+          type: object
+          description: Options of the requested transformation.
+          properties:
+            transformation:
+              type: string
+              description: The transformation string from the request URL, for example `e-removedotbg`. Not present if the URL has no transformation.
+      required: [ type ]
+
+    # ---- Event: image accepted ----
+    ImageAsyncTransformationAcceptedEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseWebhookEvent"
+        - type: object
+          description: |
+            Triggered when a new asynchronous image transformation request is accepted for processing. This event confirms that ImageKit has received and queued your transformation request. Use this for debugging and tracking transformation lifecycle.
+          properties:
+            type:
+              type: string
+              const: "image.async-transformation.accepted"
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp when the event was created in ISO8601 format.
+            request:
+              $ref: "#/components/schemas/ImageWebhookRequestInfo"
+            data:
+              type: object
+              properties:
+                asset:
+                  $ref: "#/components/schemas/ImageAsset"
+                transformation:
+                  $ref: "#/components/schemas/ImageTransformationBase"
+              required: [ asset, transformation ]
+          required: [ type, created_at, request, data ]
+
+    # ---- Event: image ready ----
+    ImageAsyncTransformationReadyEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseWebhookEvent"
+        - type: object
+          description: |
+            Triggered when an asynchronous image transformation is finished and the transformed image is ready to be served. Listen to this webhook and update any flags in your database or CMS so your application can start displaying the transformed image to users.
+          properties:
+            type:
+              type: string
+              const: "image.async-transformation.ready"
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp when the event was created in ISO8601 format.
+            request:
+              $ref: "#/components/schemas/ImageWebhookRequestInfo"
+            timings:
+              type: object
+              description: Performance metrics for the transformation process.
+              properties:
+                queue_duration:
+                  type: integer
+                  description: Time the request waited in the queue before processing started, in milliseconds.
+                processing_duration:
+                  type: integer
+                  description: Time spent processing the transformation, in milliseconds.
+            data:
+              type: object
+              properties:
+                asset:
+                  $ref: "#/components/schemas/ImageAsset"
+                transformation:
+                  allOf:
+                    - $ref: "#/components/schemas/ImageTransformationBase"
+                    - type: object
+                      properties:
+                        output:
+                          type: object
+                          description: Information about the transformed output image.
+                          properties:
+                            url:
+                              type: string
+                              format: uri
+                              description: URL to access the transformed image.
+                            image_metadata:
+                              type: object
+                              description: Metadata of the output image.
+                              properties:
+                                format:
+                                  type: string
+                                  description: Format of the output image, for example `webp` or `png`.
+                                size:
+                                  type: integer
+                                  description: Size of the output image in bytes.
+                              required: [ size ]
+                          required: [ url ]
+              required: [ asset, transformation ]
+          required: [ type, created_at, request, data ]
+
+    # ---- Event: image error ----
+    ImageAsyncTransformationErrorEvent:
+      allOf:
+        - $ref: "#/components/schemas/BaseWebhookEvent"
+        - type: object
+          description: |
+            Triggered when an asynchronous image transformation fails. Listen to this webhook to log error reasons and debug issues. Check your origin and URL endpoint settings if the reason is related to download failure. For other errors, contact ImageKit support.
+          properties:
+            type:
+              type: string
+              const: "image.async-transformation.error"
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp when the event was created in ISO8601 format.
+            request:
+              $ref: "#/components/schemas/ImageWebhookRequestInfo"
+            data:
+              type: object
+              properties:
+                asset:
+                  $ref: "#/components/schemas/ImageAsset"
+                transformation:
+                  allOf:
+                    - $ref: "#/components/schemas/ImageTransformationBase"
+                    - type: object
+                      properties:
+                        error:
+                          type: object
+                          description: Details about the transformation error.
+                          properties:
+                            reason:
+                              type: string
+                              description: |
+                                Specific reason for the transformation failure:
+                                - `download_failed`: Could not download the source image
+                                - `invalid_transformation`: The requested transformation is invalid
+                                - `limit_exceeded`: The source image or transformation exceeds a limit
+                                - `internal_server_error`: Unexpected server error
+                              enum: [ download_failed, invalid_transformation, limit_exceeded, internal_server_error ]
+                            message:
+                              type: string
+                              description: A description of the error, when available.
                           required: [ reason ]
               required: [ asset, transformation ]
           required: [ type, created_at, request, data ]
@@ -15127,6 +15307,54 @@ webhooks:
           application/json:
             schema:
               $ref: "#/components/schemas/VideoTransformationErrorEvent"
+      responses:
+        "200":
+          description: Acknowledge
+
+  image.async-transformation.accepted:
+    post:
+      operationId: image-async-transformation-accepted
+      summary: Image async transformation accepted
+      description: |
+        Triggered when a new asynchronous image transformation request is accepted for processing. This event is primarily useful for debugging purposes and tracking the start of image transformations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImageAsyncTransformationAcceptedEvent"
+      responses:
+        "200":
+          description: Acknowledge
+
+  image.async-transformation.ready:
+    post:
+      operationId: image-async-transformation-ready
+      summary: Image async transformation ready
+      description: |
+        Triggered when an asynchronous image transformation is finished and the transformed image is ready to be served. Listen to this webhook and update any flags in your database or CMS so your application can start displaying the transformed image to users.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImageAsyncTransformationReadyEvent"
+      responses:
+        "200":
+          description: Acknowledge
+
+  image.async-transformation.error:
+    post:
+      operationId: image-async-transformation-error
+      summary: Image async transformation error
+      description: |
+        Triggered when an asynchronous image transformation fails. Listen to this webhook to log the error reason and take appropriate action. Check your origin and URL endpoint settings if the reason is related to download failure.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImageAsyncTransformationErrorEvent"
       responses:
         "200":
           description: Acknowledge
