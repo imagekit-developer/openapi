@@ -8221,7 +8221,7 @@ components:
         - $ref: "#/components/schemas/BaseWebhookEvent"
         - type: object
           description: |
-            Triggered when a folder is updated, for example when its custom metadata changes or it is renamed. Renaming a folder sends one event per folder in the tree, each with its new `folderPath` in `data` and its old `folderPath` in `previous`.
+            Triggered when a folder is updated, for example when its custom metadata changes or it is renamed. Renaming a folder sends one event per folder in the tree. In each of these events, `data.folderPath` is the folder's new path and `previous.folderPath` is its path before the rename.
           properties:
             type:
               type: string
@@ -8235,7 +8235,7 @@ components:
               $ref: "#/components/schemas/FolderDetails"
             previous:
               type: object
-              description: Values the folder had before this update. Present only when the folder was renamed or its parent folder was renamed.
+              description: Present only when the folder or one of its parent folders was renamed. Contains the folder's path before the rename.
               properties:
                 folderPath:
                   type: string
@@ -8697,6 +8697,15 @@ components:
           description: |
             Automatically enhances the contrast of an image (contrast stretch).
             See [Contrast Stretch](https://imagekit.io/docs/effects-and-enhancements#contrast-stretch---e-contrast).
+        saturation:
+          type: integer
+          minimum: -100
+          maximum: 100
+          description: |
+            Adjusts the color saturation of the image. Accepts an integer from -100 to 100.
+            Negative values desaturate (`-100` is fully gray), positive values increase saturation, and `0` leaves the image unchanged.
+            Supported inside image overlays. Not supported for animated images.
+            See [Saturation](https://imagekit.io/docs/effects-and-enhancements#saturation---e-saturation).
         shadow:
           oneOf:
             - const: true
